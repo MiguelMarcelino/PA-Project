@@ -8,6 +8,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsingMultipleDispatch {
+
+    /**
+     * @param receiver - class where to search for method
+     * @param name     - name of the method to find
+     * @param args     - function arguments
+     * @return - object that represents the result from the invocation of the method
+     */
     public static Object invoke(Object receiver, String name, Object... args) {
         try {
             ArrayList<Object> objects = Arrays.stream(args).collect(Collectors.toCollection(ArrayList::new));
@@ -18,8 +25,7 @@ public class UsingMultipleDispatch {
                     filter(method -> method.getName().equals(name) && method.getParameterCount() == objects.size());
 
             ArrayList<Method> methodList = methods.collect(Collectors.toCollection(ArrayList::new));
-            Method method = findBestMethod(methodList, 0, objects, -1);
-//            System.err.println(method.toString());
+            Method method = findBestMethod(methodList, objects, 0, -1);
             return method.invoke(receiver, args);
         } catch (IllegalAccessException | InvocationTargetException |
                 NoSuchMethodException e) {
@@ -29,15 +35,15 @@ public class UsingMultipleDispatch {
     }
 
     /**
-     * @param methodList
-     * @param currPos
-     * @param objects
-     * @param bestMethodIndex
-     * @return
-     * @throws NoSuchMethodException
+     * @param methodList      - List of methods to analyze
+     * @param currPos         - current position of the method array
+     * @param objects         - List of parameters from function
+     * @param bestMethodIndex - Index of the best matching method found until a given point
+     * @return - best method with most specific arguments
+     * @throws NoSuchMethodException - in case no method is found with given info
      */
-    static Method findBestMethod(ArrayList<Method> methodList, int currPos,
-                                 ArrayList<Object> objects, int bestMethodIndex) throws NoSuchMethodException {
+    static Method findBestMethod(ArrayList<Method> methodList, ArrayList<Object> objects,
+                                 int currPos, int bestMethodIndex) throws NoSuchMethodException {
         if (currPos == methodList.size()) {
             if (bestMethodIndex == -1 || methodList.size() == 0) {
                 throw new NoSuchMethodException();
@@ -64,8 +70,12 @@ public class UsingMultipleDispatch {
         }
 
         int newBest = bestPos >= 0 ? bestPos : bestMethodIndex;
-        return findBestMethod(methodList, currPos + 1, objects, newBest);
+        return findBestMethod(methodList, objects, currPos + 1, newBest);
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////// Old functions ////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
 //    /**
 //     * @param methodList

@@ -1,6 +1,7 @@
 package ist.meic.pava.MultipleDispatch.example;
 
 public class Printer extends Device {
+    // For example 1
     public void draw(Shape s) {
         System.err.println("draw what on printer?");
     }
@@ -11,15 +12,25 @@ public class Printer extends Device {
         System.err.println("drawing a circle on printer!");
     }
 
+    // For example 2
     public void draw(Line l, Brush b) {
         System.err.println("drawing a line on printer with what");
     }
-
     public void draw(Circle c, Pencil p) {
         System.err.println("drawing a circle on printer with pencil");
     }
-
     public void draw(Circle c, Crayon r) {
         System.err.println("drawing a circle on printer with crayon");
+    }
+
+    // For example 3
+    public void draw(Line l, Brush b, Circle c) {
+        System.err.println("----drawing a line on printer with what");
+    }
+    public void draw(Circle c, Pencil p, Line l) {
+        System.err.println("----drawing a circle on printer with pencil");
+    }
+    public void draw(Circle c, Crayon r, Line l) {
+        System.err.println("----drawing a circle on printer with crayon");
     }
 }

@@ -8,6 +8,7 @@ public class Testing {
         ExampleClass.example1();
         System.err.println("\nStarting test 2");
         ExampleClass.example2();
-        
+        System.err.println("\nStarting test 3");
+        ExampleClass.example3();
     }
 }

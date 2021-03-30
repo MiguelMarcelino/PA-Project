@@ -34,6 +34,23 @@ public class ExampleClass {
         }
     }
 
+    public static void example3() {
+        Device[] devices = new Device[] { new Screen(), new Printer() };
+        Shape[] shapes = new Shape[] { new Line(), new Circle() };
+        Brush[] brushes = new Brush[] { new Pencil(), new Crayon() };
+
+        for (Device device : devices) {
+            for (Shape shape : shapes) {
+                for (Brush brush : brushes) {
+                    for (Shape shape2 : shapes) {
+                        UsingMultipleDispatch.invoke(device, "draw", shape, brush, shape2);
+                    }
+                    // device.draw(shape, brush);
+                }
+            }
+        }
+    }
+
     public static String defaultValues() {
         String resTest1 = "Starting test 1\n" +
                 "drawing a line on screen!\n" +
