@@ -4,9 +4,10 @@ import ist.meic.pava.MultipleDispatch.example.ExampleClass;
 
 public class Testing {
     public static void main(String[] args) {
-        System.err.println("Starting test 1\n");
+        System.err.println("Starting test 1");
         ExampleClass.example1();
-        System.err.println("\nStarting test 2\n");
+        System.err.println("\nStarting test 2");
         ExampleClass.example2();
+        
     }
 }
