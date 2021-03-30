@@ -23,7 +23,7 @@ public class ExampleClass {
             for (Shape shape : shapes) {
                 for (Brush brush : brushes) {
                     // device.draw(shape, brush);
-                    // UsingMultipleDispatch.invoke(device, "draw", shape, brush);
+                    UsingMultipleDispatch.invoke(device, "draw", shape, brush);
                 }
             }
         }

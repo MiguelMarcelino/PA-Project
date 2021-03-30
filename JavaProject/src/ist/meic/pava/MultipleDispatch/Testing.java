@@ -6,7 +6,7 @@ public class Testing {
     public static void main(String[] args) {
         System.err.println("Starting test 1\n");
         ExampleClass.example1();
-//        System.err.println("\nStarting test 2\n");
-//        ExampleClass.example2();
+        System.err.println("\nStarting test 2\n");
+        ExampleClass.example2();
     }
 }
