@@ -36,15 +36,15 @@ public class Screen extends Device{
         // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Pencil p, Circle c) {
-        System.err.println("----drawing a line on screen with pencil!");
+        System.err.println("----drawing a line on screen with pencil (circle)!");
     }
     public void draw(Line l, Crayon c, Circle cl) {
-        System.err.println("----drawing a line on screen with crayon!");
+        System.err.println("----drawing a line on screen with crayon (circle)!");
     }
     public void draw(Circle c, Brush b, Line l) {
-        System.err.println("----drawing a circle on screen with what?");
+        System.err.println("----drawing a circle on screen with what (line)?");
     }
     public void draw(Circle c, Pencil p, Line l) {
-        System.err.println("----drawing a circle on screen with pencil!");
+        System.err.println("----drawing a circle on screen with pencil (line)!");
     }
 }

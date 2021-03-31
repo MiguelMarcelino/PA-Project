@@ -28,9 +28,9 @@ public class Device {
         System.err.println("----draw what where and with what?");
     }
     public void draw(Line l, Brush b, Circle c) {
-        System.err.println("----draw a line where and with what?");
+        System.err.println("----draw a line where and with what (circle)?");
     }
     public void draw(Circle c, Brush b, Line l) {
-        System.err.println("----draw a circle where and with what?");
+        System.err.println("----draw a circle where and with what (line)?");
     }
 }
