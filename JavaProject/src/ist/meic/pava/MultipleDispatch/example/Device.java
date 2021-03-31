@@ -33,4 +33,9 @@ public class Device {
     public void draw(Circle c, Brush b, Line l) {
         System.err.println("----draw a circle where and with what (line)?");
     }
+
+    // For example 4
+    public void draw(Shape s, Brush b, Color c) {
+        System.err.println("----draw what where and with what (color)?");
+    }
 }

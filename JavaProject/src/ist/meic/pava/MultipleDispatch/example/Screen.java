@@ -47,4 +47,38 @@ public class Screen extends Device{
     public void draw(Circle c, Pencil p, Line l) {
         System.err.println("----drawing a circle on screen with pencil (line)!");
     }
+
+    // For example 4
+    public void draw(Line l, Brush b, Color c) {
+        System.err.println("----draw a line on screen and with what (Color)?");
+        // Previously it was: draw what where and with what? --> should it be on screen?
+    }
+
+    public void draw(Line l, Brush b, Yellow c) {
+        System.err.println("----draw a line on screen and with what (Yellow)?");
+        // Previously it was: draw what where and with what? --> should it be on screen?
+    }
+
+    public void draw(Line l, Crayon b, Color c) {
+        System.err.println("----draw a line on screen and with crayon (Color)?");
+        // Previously it was: draw what where and with what? --> should it be on screen?
+    }
+
+    public void draw(Line l, MiniCrayon b, Color c) {
+        System.err.println("----draw a line on screen and with Minicrayon (Color)?");
+        // Previously it was: draw what where and with what? --> should it be on screen?
+    }
+
+    public void draw(Line l, Pencil p, Brown b) {
+        System.err.println("----drawing a line on screen with pencil (Brown)!");
+    }
+    public void draw(Line l, Crayon c, Brown b) {
+        System.err.println("----drawing a line on screen with crayon (Brown)!");
+    }
+    public void draw(Circle c, Brush b, Yellow y) {
+        System.err.println("----drawing a circle on screen with what (Yellow)?");
+    }
+    public void draw(Circle c, Pencil p, Yellow y) {
+        System.err.println("----drawing a circle on screen with pencil (Yellow)!");
+    }
 }

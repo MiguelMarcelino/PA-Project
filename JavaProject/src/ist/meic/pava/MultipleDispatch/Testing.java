@@ -10,5 +10,7 @@ public class Testing {
         ExampleClass.example2();
         System.err.println("\nStarting test 3");
         ExampleClass.example3();
+        System.err.println("\nStarting test 4");
+        ExampleClass.example4();
     }
 }

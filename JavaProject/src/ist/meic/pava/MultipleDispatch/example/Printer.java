@@ -33,4 +33,15 @@ public class Printer extends Device {
     public void draw(Circle c, Crayon r, Line l) {
         System.err.println("----drawing a circle on printer with crayon (line)");
     }
+
+    // For example 4
+    public void draw(Line l, Brush b, Brown c) {
+        System.err.println("----drawing a line on printer with what (Brown)");
+    }
+    public void draw(Circle c, Pencil p, Yellow y) {
+        System.err.println("----drawing a circle on printer with pencil (Yellow)");
+    }
+    public void draw(Circle c, Crayon r, Brown cl) {
+        System.err.println("----drawing a circle on printer with crayon (Brown)");
+    }
 }

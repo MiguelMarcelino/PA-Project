@@ -53,14 +53,21 @@ public class UsingMultipleDispatch {
 
         Class[] parameterTypes = methodList.get(currPos).getParameterTypes();
         int bestPos = currPos;
+        boolean moreSpecific = false;
         for (int i = 0; i < objects.size() && bestPos >= 0; i++) {
             if (parameterTypes[i].isAssignableFrom(objects.get(i).getClass())) {
                 // case where best method was not found yet
                 if (bestMethodIndex >= 0) {
-                    Class[] currBestMethod = methodList.get(bestMethodIndex).getParameterTypes();
-                    if (currBestMethod[i].isAssignableFrom(parameterTypes[i])) {
+                    Class[] currBestMethodParams = methodList.get(bestMethodIndex).getParameterTypes();
+
+                    if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                         bestPos = currPos;
-                    } else {
+                        // parameter being analyzed is more specific than parameter from best Method
+                        // in position i
+                        if(currBestMethodParams[i].isAssignableFrom(parameterTypes[i].getSuperclass())) {
+                            moreSpecific = true;
+                        }
+                    } else if(!moreSpecific){
                         bestPos = -1;
                     }
                 }

@@ -51,6 +51,30 @@ public class ExampleClass {
         }
     }
 
+    public static void example4() {
+        /*Device[] devices = new Device[] { new Screen(), new Printer() };
+        Shape[] shapes = new Shape[] { new Line(), new Circle() };
+        Brush[] brushes = new Brush[] { new Pencil(), new Crayon() };
+        Color[] colors = new Color[] { new Brown(), new Yellow()};*/
+
+        Device[] devices = new Device[] { new Screen() };
+        Shape[] shapes = new Shape[] { new Line() };
+        Brush[] brushes = new Brush[] { new MiniCrayon() };
+        Color[] colors = new Color[] {new Yellow()};
+
+        for (Device device : devices) {
+            for (Shape shape : shapes) {
+                for (Brush brush : brushes) {
+                    for (Color color : colors) {
+                        System.err.println(device.getClass().getSimpleName() + " " + shape.getClass().getSimpleName() + " " + brush.getClass().getSimpleName() + " " + color.getClass().getSimpleName());
+                        UsingMultipleDispatch.invoke(device, "draw", shape, brush, color);
+                    }
+                    // device.draw(shape, brush);
+                }
+            }
+        }
+    }
+
     public static String defaultValues() {
         String resTest1 = "Starting test 1\n" +
                 "drawing a line on screen!\n" +
