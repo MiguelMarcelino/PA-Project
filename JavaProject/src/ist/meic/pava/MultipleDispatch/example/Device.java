@@ -38,4 +38,9 @@ public class Device {
     public void draw(Shape s, Brush b, Color c) {
         System.err.println("----draw what where and with what (color)?");
     }
+
+    // For example 5
+    public void draw(Shape s, Brush b, Color c, Brush b2) {
+        System.err.println("----draw what where and with what (color)?");
+    }
 }

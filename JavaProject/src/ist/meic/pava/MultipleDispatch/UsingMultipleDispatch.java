@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,18 +21,68 @@ public class UsingMultipleDispatch {
             ArrayList<Object> objects = Arrays.stream(args).collect(Collectors.toCollection(ArrayList::new));
             Class classType = receiver.getClass();
 
-            // TODO: Try to change to variable arity methods
             Stream<Method> methods = Arrays.stream(classType.getMethods()).
                     filter(method -> method.getName().equals(name) && method.getParameterCount() == objects.size());
 
             ArrayList<Method> methodList = methods.collect(Collectors.toCollection(ArrayList::new));
             Method method = findBestMethod(methodList, objects, 0, -1);
+//            Method method = findBestMethodV2(methodList, objects);
             return method.invoke(receiver, args);
         } catch (IllegalAccessException | InvocationTargetException |
                 NoSuchMethodException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    /**
+     * @param methodList - List of methods to analyze
+     * @param objects    - List of parameters from function
+     * @return - best method with most specific arguments
+     * @throws NoSuchMethodException - in case no method is found with given info
+     */
+    static Method findBestMethodV2(ArrayList<Method> methodList, ArrayList<Object> objects)
+            throws NoSuchMethodException {
+        List<Method> matchingMethods = methodList.stream().filter(method -> {
+            Class[] parameterTypes = method.getParameterTypes();
+            for (int i = 0; i < objects.size(); i++) {
+                if (!parameterTypes[i].isAssignableFrom(objects.get(i).getClass())) {
+                    return false;
+                }
+            }
+            return true;
+        }).collect(Collectors.toList());
+
+        Method best = matchingMethods.get(0);
+        if (best == null) {
+            throw new NoSuchMethodException();
+        }
+
+        for (Method method : matchingMethods) {
+            int bestPos = 0;
+            boolean isMoreSpecific = false;
+            Class[] parameterTypes = method.getParameterTypes();
+            Class[] currBestMethodParams = best.getParameterTypes();
+            for (int i = 0; i < objects.size() && (bestPos >= 0 && !isMoreSpecific); i++) {
+                if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
+                    if (currBestMethodParams[i] != parameterTypes[i]) {
+                        bestPos = -1;
+                    }
+                } else {
+                    isMoreSpecific = true;
+                }
+            }
+
+            if (bestPos == -1) {
+                best = method;
+            }
+            // invoke(screen, "draw", line, crayon, yellow)
+            // screen.draw(line,brush,yellow) parameterTypes
+            // screen.draw(line,crayon,color) currBest
+        }
+        ;
+
+        return best;
     }
 
     /**
@@ -59,15 +110,18 @@ public class UsingMultipleDispatch {
                 // case where best method was not found yet
                 if (bestMethodIndex >= 0) {
                     Class[] currBestMethodParams = methodList.get(bestMethodIndex).getParameterTypes();
-
                     if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                         bestPos = currPos;
                         // parameter being analyzed is more specific than parameter from best Method
                         // in position i
-                        if(currBestMethodParams[i].isAssignableFrom(parameterTypes[i].getSuperclass())) {
+                        if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i].getSuperclass())) {
                             moreSpecific = true;
                         }
-                    } else if(!moreSpecific){
+                        // Also works apparently! Tested and results were the same
+//                        if (currBestMethodParams[i] != parameterTypes[i]) {
+//                            moreSpecific = true;
+//                        }
+                    } else if (!moreSpecific) {
                         bestPos = -1;
                     }
                 }
