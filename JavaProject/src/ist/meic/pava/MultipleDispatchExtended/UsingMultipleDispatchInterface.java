@@ -4,8 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class UsingMultipleDispatchInterface {
 
@@ -25,7 +25,7 @@ public class UsingMultipleDispatchInterface {
                             method.getParameterCount() == objects.size())
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            Method method = findBestMethod(methodList, objects, 0, -1);
+            Method method = findBestMethod(methodList, objects);
             return method.invoke(receiver, args);
         } catch (IllegalAccessException | InvocationTargetException |
                 NoSuchMethodException e) {
@@ -35,48 +35,42 @@ public class UsingMultipleDispatchInterface {
     }
 
     /**
-     * @param methodList      - List of methods to analyze
-     * @param currPos         - current position of the method array
-     * @param objects         - List of parameters from function
-     * @param bestMethodIndex - Index of the best matching method found until a given point
+     * @param methodList - List of methods to analyze
+     * @param objects    - List of parameters from function
      * @return - best method with most specific arguments
      * @throws NoSuchMethodException - in case no method is found with given info
      */
-    static Method findBestMethod(ArrayList<Method> methodList, ArrayList<Object> objects,
-                                 int currPos, int bestMethodIndex) throws NoSuchMethodException {
-        if (currPos == methodList.size()) {
-            if (bestMethodIndex == -1 || methodList.size() == 0) {
-                throw new NoSuchMethodException();
+    static Method findBestMethod(ArrayList<Method> methodList, ArrayList<Object> objects)
+            throws NoSuchMethodException {
+        List<Method> matchingMethods = methodList.stream().filter(method -> {
+            Class[] parameterTypes = method.getParameterTypes();
+            for (int i = 0; i < objects.size(); i++) {
+                if (!parameterTypes[i].isAssignableFrom(objects.get(i).getClass()))
+                    return false;
             }
-            return methodList.get(bestMethodIndex);
-        }
+            return true;
+        }).collect(Collectors.toList());
 
-        Class[] parameterTypes = methodList.get(currPos).getParameterTypes();
-        int bestPos = currPos;
-        boolean moreSpecific = false;
-        for (int i = 0; i < objects.size() && bestPos >= 0; i++) {
-            if (parameterTypes[i].isAssignableFrom(objects.get(i).getClass())) {
-                // case where best method was not found yet
-                if (bestMethodIndex >= 0) {
-                    Class[] currBestMethodParams = methodList.get(bestMethodIndex).getParameterTypes();
+        Method best = matchingMethods.get(0);
+        if (best == null) throw new NoSuchMethodException();
 
-                    if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
-                        bestPos = currPos;
-                        // parameter being analyzed is more specific than parameter from best Method
-                        // in position i
-                        if(currBestMethodParams[i].isAssignableFrom(parameterTypes[i].getSuperclass())) {
-                            moreSpecific = true;
-                        }
-                    } else if(!moreSpecific){
+        for (Method method : matchingMethods) {
+            int bestPos = 0;
+            boolean isMoreSpecific = false;
+            Class[] parameterTypes = method.getParameterTypes();
+            Class[] currBestMethodParams = best.getParameterTypes();
+            for (int i = 0; i < objects.size() && bestPos >= 0 && !isMoreSpecific; i++) {
+                if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
+                    if (currBestMethodParams[i] != parameterTypes[i])
                         bestPos = -1;
-                    }
+                } else {
+                    isMoreSpecific = true;
                 }
-            } else {
-                bestPos = -1;
             }
+
+            if (bestPos == -1) best = method;
         }
 
-        int newBest = bestPos >= 0 ? bestPos : bestMethodIndex;
-        return findBestMethod(methodList, objects, currPos + 1, newBest);
+        return best;
     }
 }

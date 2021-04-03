@@ -36,6 +36,10 @@ public class Testing {
         compareTestResults(outputFile);
     }
 
+    /**
+     * Sets error output to a file
+     * @return file where to output all error messages
+     */
     public static File setErrorOutputFile() {
         File file = new File("test_results.txt");
         FileOutputStream fos = null;
@@ -49,6 +53,10 @@ public class Testing {
         return file;
     }
 
+    /**
+     * Compare results of tests
+     * @param outputFile
+     */
     public static void compareTestResults(File outputFile) {
         File expectedResults = new File("expected_results.txt");
         FileInputStream fisExpected = null;
