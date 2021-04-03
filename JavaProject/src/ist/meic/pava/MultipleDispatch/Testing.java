@@ -1,6 +1,7 @@
 package ist.meic.pava.MultipleDispatch;
 
 import ist.meic.pava.MultipleDispatch.example.ExampleClass;
+import ist.meic.pava.MultipleDispatch.example.ExampleClassExtended;
 
 public class Testing {
     public static void main(String[] args) {
@@ -18,5 +19,13 @@ public class Testing {
 
         System.err.println("\nStarting test 5");
         ExampleClass.example5();
+
+        System.err.println("\n---------------------------");
+        System.err.println("Extended tests");
+        System.err.println("---------------------------");
+
+        System.err.println("Test for Boxing an Unboxing");
+        System.err.println("Starting extended test 1");
+        ExampleClassExtended.exampleExtended1();
     }
 }

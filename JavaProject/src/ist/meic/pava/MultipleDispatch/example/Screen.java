@@ -33,7 +33,6 @@ public class Screen extends Device{
     // For example 3
     public void draw(Line l, Brush b, Shape s) {
         System.err.println("----draw a line on screen and with what?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Pencil p, Circle c) {
         System.err.println("----drawing a line on screen with pencil (circle)!");
@@ -51,19 +50,15 @@ public class Screen extends Device{
     // For example 4
     public void draw(Line l, Brush b, Color c) {
         System.err.println("----draw a line on screen and with what (Color)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Brush b, Yellow c) {
         System.err.println("----draw a line on screen and with what (Yellow)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Crayon b, Color c) {
         System.err.println("----draw a line on screen and with crayon (Color)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, MiniCrayon b, Color c) {
         System.err.println("----draw a line on screen and with Minicrayon (Color)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Pencil p, Brown b) {
         System.err.println("----drawing a line on screen with pencil (Brown)!");
@@ -81,19 +76,15 @@ public class Screen extends Device{
     // For example 5
     public void draw(Line l, Brush b, Color c, Brush b2) {
         System.err.println("----draw a line on screen and with what (Color)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Brush b, Yellow c, Brush b2) {
         System.err.println("----draw a line on screen and with what (Yellow)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Crayon b, Color c, Pencil b2) {
         System.err.println("----draw a line on screen and with crayon (Color)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Crayon b, Color c, Crayon b2) {
         System.err.println("----draw a line on screen and with Minicrayon (Color)?");
-        // Previously it was: draw what where and with what? --> should it be on screen?
     }
     public void draw(Line l, Pencil p, Brown b, Pencil p2) {
         System.err.println("----drawing a line on screen with pencil (Brown)!");
@@ -106,5 +97,16 @@ public class Screen extends Device{
     }
     public void draw(Circle c, Pencil p, Yellow y, Pencil p2) {
         System.err.println("----drawing a circle on screen with pencil (Yellow)!");
+    }
+
+    // For example extended 1
+    public void draw(Line l, Integer i) {
+        System.err.println("draw a line on screen and with what (INTEGER)?");
+    }
+    public void draw(Line l, int i) {
+        System.err.println("drawing a line on screen with (INT)!");
+    }
+    public void draw(Circle l, int i) {
+        System.err.println("draw a circle on screen and with what (INT)");
     }
 }

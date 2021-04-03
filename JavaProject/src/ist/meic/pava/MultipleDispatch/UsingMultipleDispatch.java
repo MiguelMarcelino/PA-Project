@@ -21,17 +21,18 @@ public class UsingMultipleDispatch {
             ArrayList<Object> objects = Arrays.stream(args).collect(Collectors.toCollection(ArrayList::new));
             Class classType = receiver.getClass();
 
-            Stream<Method> methods = Arrays.stream(classType.getMethods()).
-                    filter(method -> method.getName().equals(name) && method.getParameterCount() == objects.size());
+            ArrayList<Method> methodList = Arrays.stream(classType.getMethods())
+                    .filter(method -> method.getName().equals(name) &&
+                            method.getParameterCount() == objects.size())
+                    .collect(Collectors.toCollection(ArrayList::new));
 
-            ArrayList<Method> methodList = methods.collect(Collectors.toCollection(ArrayList::new));
-            Method method = findBestMethod(methodList, objects, 0, -1);
-//            Method method = findBestMethodV2(methodList, objects);
+            Method method = findBestMethod(methodList, objects);
+            // Alternative Method (more efficient)
+            // Method method = findBestMethodV2(methodList, objects, 0, -1);
             return method.invoke(receiver, args);
         } catch (IllegalAccessException | InvocationTargetException |
                 NoSuchMethodException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -41,51 +42,43 @@ public class UsingMultipleDispatch {
      * @return - best method with most specific arguments
      * @throws NoSuchMethodException - in case no method is found with given info
      */
-    static Method findBestMethodV2(ArrayList<Method> methodList, ArrayList<Object> objects)
+    static Method findBestMethod(ArrayList<Method> methodList, ArrayList<Object> objects)
             throws NoSuchMethodException {
         List<Method> matchingMethods = methodList.stream().filter(method -> {
             Class[] parameterTypes = method.getParameterTypes();
             for (int i = 0; i < objects.size(); i++) {
-                if (!parameterTypes[i].isAssignableFrom(objects.get(i).getClass())) {
+                if (!parameterTypes[i].isAssignableFrom(objects.get(i).getClass()))
                     return false;
-                }
             }
             return true;
         }).collect(Collectors.toList());
 
         Method best = matchingMethods.get(0);
-        if (best == null) {
-            throw new NoSuchMethodException();
-        }
+        if (best == null) throw new NoSuchMethodException();
 
         for (Method method : matchingMethods) {
             int bestPos = 0;
             boolean isMoreSpecific = false;
             Class[] parameterTypes = method.getParameterTypes();
             Class[] currBestMethodParams = best.getParameterTypes();
-            for (int i = 0; i < objects.size() && (bestPos >= 0 && !isMoreSpecific); i++) {
+            for (int i = 0; i < objects.size() && bestPos >= 0 && !isMoreSpecific; i++) {
                 if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
-                    if (currBestMethodParams[i] != parameterTypes[i]) {
+                    if (currBestMethodParams[i] != parameterTypes[i])
                         bestPos = -1;
-                    }
                 } else {
                     isMoreSpecific = true;
                 }
             }
 
-            if (bestPos == -1) {
-                best = method;
-            }
-            // invoke(screen, "draw", line, crayon, yellow)
-            // screen.draw(line,brush,yellow) parameterTypes
-            // screen.draw(line,crayon,color) currBest
+            if (bestPos == -1) best = method;
         }
-        ;
 
         return best;
     }
 
     /**
+     * Version 2 of the findBestMethod algorithm. Removes one iteration
+     *
      * @param methodList      - List of methods to analyze
      * @param currPos         - current position of the method array
      * @param objects         - List of parameters from function
@@ -93,12 +86,13 @@ public class UsingMultipleDispatch {
      * @return - best method with most specific arguments
      * @throws NoSuchMethodException - in case no method is found with given info
      */
-    static Method findBestMethod(ArrayList<Method> methodList, ArrayList<Object> objects,
-                                 int currPos, int bestMethodIndex) throws NoSuchMethodException {
+    static Method findBestMethodV2(ArrayList<Method> methodList, ArrayList<Object> objects,
+                                   int currPos, int bestMethodIndex) throws NoSuchMethodException {
         if (currPos == methodList.size()) {
-            if (bestMethodIndex == -1 || methodList.size() == 0) {
+            if (bestMethodIndex == -1)
                 throw new NoSuchMethodException();
-            }
+            if (methodList.isEmpty())
+                throw new RuntimeException("No methods provided for search");
             return methodList.get(bestMethodIndex);
         }
 
@@ -112,15 +106,9 @@ public class UsingMultipleDispatch {
                     Class[] currBestMethodParams = methodList.get(bestMethodIndex).getParameterTypes();
                     if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                         bestPos = currPos;
-                        // parameter being analyzed is more specific than parameter from best Method
-                        // in position i
-                        if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i].getSuperclass())) {
+                        // Classes are different, so parameterTypes[i] is more specific
+                        if (currBestMethodParams[i] != parameterTypes[i])
                             moreSpecific = true;
-                        }
-                        // Also works apparently! Tested and results were the same
-//                        if (currBestMethodParams[i] != parameterTypes[i]) {
-//                            moreSpecific = true;
-//                        }
                     } else if (!moreSpecific) {
                         bestPos = -1;
                     }
@@ -131,97 +119,7 @@ public class UsingMultipleDispatch {
         }
 
         int newBest = bestPos >= 0 ? bestPos : bestMethodIndex;
-        return findBestMethod(methodList, objects, currPos + 1, newBest);
+        return findBestMethodV2(methodList, objects, currPos + 1, newBest);
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////// Old functions ////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-//    /**
-//     * @param methodList
-//     * @param currPos
-//     * @param objects
-//     * @param bestMethodIndex
-//     * @return
-//     * @throws NoSuchMethodException
-//     */
-//    static Method findBestMethod(ArrayList<Method> methodList, int currPos,
-//                                 ArrayList<Object> objects, int bestMethodIndex) throws NoSuchMethodException {
-//        if (currPos == methodList.size()) {
-//            if (bestMethodIndex == -1 || methodList.size() == 0) {
-//                throw new NoSuchMethodException();
-//            }
-//            return methodList.get(bestMethodIndex);
-//        }
-//
-//        Class[] parameterTypes = methodList.get(currPos).getParameterTypes();
-//        boolean isInstance = true;
-//        int best = -1;
-//        for (int i = 0; i < objects.size() && isInstance; i++) {
-//            if (parameterTypes[i].isAssignableFrom(objects.get(i).getClass())) {
-//                // case where best method was not found yet
-//                if (bestMethodIndex >= 0) {
-//                    Class[] currBestMethod = methodList.get(bestMethodIndex).getParameterTypes();
-//                    if (currBestMethod[i].isAssignableFrom(parameterTypes[i])) {
-//                        best = currPos;
-//                    } else {
-//                        isInstance = false;
-//                    }
-//                } else {
-//                    best = currPos;
-//                }
-//            } else {
-//                isInstance = false;
-//            }
-//        }
-//
-//        if (!isInstance) {
-//            return findBestMethod(methodList, currPos + 1, objects, bestMethodIndex);
-//        }
-//
-//        int newBest = best >= 0 ? best : bestMethodIndex;
-//        return findBestMethod(methodList, currPos + 1, objects, newBest);
-//    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////// Shame ////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-//    static Method findBestMethod(Class classType, String name, int pos,
-//                                 ArrayList<Class> objects, int iter) throws NoSuchMethodException {
-//        try {
-//            Class[] parameters = new Class[objects.size()];
-//            for(int i = 0; i < objects.size(); i++) {
-//                parameters[i] = objects.get(i);
-//            }
-//            Method method = classType.getMethod(name, parameters);
-//
-//            // if no exception thrown and there are still objects to analyze
-//            if(pos < objects.size() - 1) {
-//                return findBestMethod(classType, name, pos + 1, objects, iter + 1);
-//            }
-//
-//            return method;
-//        } catch (NoSuchMethodException e) {
-//            if (objects.get(pos) == Object.class) {
-//                throw e;
-//            } else {
-//                // TODO: check
-//                // Idea: if method not found yet, go through positions again
-//                if(pos == objects.size()) {
-//                    return findBestMethod(classType, name, 0, objects, 0);
-//                }
-//                else {
-//                    if(iter % 2 != 0) {
-//                        Class newObject = objects.get(pos).getSuperclass();
-//                        objects.set(pos, newObject);
-//                        return findBestMethod(classType, name, pos, objects, iter + 1);
-//                    } else {
-//                        return findBestMethod(classType, name, pos + 1, objects, iter + 1);
-//                    }
-//                }
-//            }
-//        }
-//    }
 }
