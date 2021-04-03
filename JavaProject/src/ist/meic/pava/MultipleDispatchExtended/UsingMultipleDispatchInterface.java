@@ -20,11 +20,11 @@ public class UsingMultipleDispatchInterface {
             ArrayList<Object> objects = Arrays.stream(args).collect(Collectors.toCollection(ArrayList::new));
             Class classType = receiver.getClass();
 
-            // TODO: Try to change to variable arity methods
-            Stream<Method> methods = Arrays.stream(classType.getMethods()).
-                    filter(method -> method.getName().equals(name) && method.getParameterCount() == objects.size());
+            ArrayList<Method> methodList = Arrays.stream(classType.getMethods())
+                    .filter(method -> method.getName().equals(name) &&
+                            method.getParameterCount() == objects.size())
+                    .collect(Collectors.toCollection(ArrayList::new));
 
-            ArrayList<Method> methodList = methods.collect(Collectors.toCollection(ArrayList::new));
             Method method = findBestMethod(methodList, objects, 0, -1);
             return method.invoke(receiver, args);
         } catch (IllegalAccessException | InvocationTargetException |

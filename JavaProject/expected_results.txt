@@ -1,0 +1,185 @@
+Starting test 1
+Screen Line
+drawing a line on screen!
+Screen Circle
+drawing a circle on screen!
+Printer Line
+drawing a line on printer!
+Printer Circle
+drawing a circle on printer!
+
+Starting test 2
+Screen Line Pencil
+drawing a line on screen with pencil!
+Screen Line Crayon
+drawing a line on screen with crayon!
+Screen Circle Pencil
+drawing a circle on screen with pencil!
+Screen Circle Crayon
+drawing a circle on screen with what?
+Printer Line Pencil
+drawing a line on printer with what
+Printer Line Crayon
+drawing a line on printer with what
+Printer Circle Pencil
+drawing a circle on printer with pencil
+Printer Circle Crayon
+drawing a circle on printer with crayon
+
+Starting test 3
+Screen Line Pencil Line
+----draw a line on screen and with what?
+Screen Line Pencil Circle
+----drawing a line on screen with pencil (circle)!
+Screen Line Crayon Line
+----draw a line on screen and with what?
+Screen Line Crayon Circle
+----drawing a line on screen with crayon (circle)!
+Screen Circle Pencil Line
+----drawing a circle on screen with pencil (line)!
+Screen Circle Pencil Circle
+----draw what where and with what?
+Screen Circle Crayon Line
+----drawing a circle on screen with what (line)?
+Screen Circle Crayon Circle
+----draw what where and with what?
+Printer Line Pencil Line
+----draw what where and with what?
+Printer Line Pencil Circle
+----drawing a line on printer with what (circle)
+Printer Line Crayon Line
+----draw what where and with what?
+Printer Line Crayon Circle
+----drawing a line on printer with what (circle)
+Printer Circle Pencil Line
+----drawing a circle on printer with pencil (line)
+Printer Circle Pencil Circle
+----draw what where and with what?
+Printer Circle Crayon Line
+----drawing a circle on printer with crayon (line)
+Printer Circle Crayon Circle
+----draw what where and with what?
+
+Starting test 4
+Screen Line Pencil Brown
+----drawing a line on screen with pencil (Brown)!
+Screen Line Pencil Yellow
+----draw a line on screen and with what (Yellow)?
+Screen Line Crayon Brown
+----drawing a line on screen with crayon (Brown)!
+Screen Line Crayon Yellow
+----draw a line on screen and with crayon (Color)?
+Screen Circle Pencil Brown
+----draw what where and with what (color)?
+Screen Circle Pencil Yellow
+----drawing a circle on screen with pencil (Yellow)!
+Screen Circle Crayon Brown
+----draw what where and with what (color)?
+Screen Circle Crayon Yellow
+----drawing a circle on screen with what (Yellow)?
+Printer Line Pencil Brown
+----drawing a line on printer with what (Brown)
+Printer Line Pencil Yellow
+----draw what where and with what (color)?
+Printer Line Crayon Brown
+----drawing a line on printer with what (Brown)
+Printer Line Crayon Yellow
+----draw what where and with what (color)?
+Printer Circle Pencil Brown
+----draw what where and with what (color)?
+Printer Circle Pencil Yellow
+----drawing a circle on printer with pencil (Yellow)
+Printer Circle Crayon Brown
+----drawing a circle on printer with crayon (Brown)
+Printer Circle Crayon Yellow
+----draw what where and with what (color)?
+
+Starting test 5
+Screen Line Pencil Brown Pencil
+----drawing a line on screen with pencil (Brown)!
+Screen Line Pencil Brown Crayon
+----draw a line on screen and with what (Color)?
+Screen Line Pencil Yellow Pencil
+----draw a line on screen and with what (Yellow)?
+Screen Line Pencil Yellow Crayon
+----draw a line on screen and with what (Yellow)?
+Screen Line Crayon Brown Pencil
+----draw a line on screen and with crayon (Color)?
+Screen Line Crayon Brown Crayon
+----drawing a line on screen with crayon (Brown)!
+Screen Line Crayon Yellow Pencil
+----draw a line on screen and with crayon (Color)?
+Screen Line Crayon Yellow Crayon
+----draw a line on screen and with Minicrayon (Color)?
+Screen Circle Pencil Brown Pencil
+----draw what where and with what (color)?
+Screen Circle Pencil Brown Crayon
+----draw what where and with what (color)?
+Screen Circle Pencil Yellow Pencil
+----drawing a circle on screen with pencil (Yellow)!
+Screen Circle Pencil Yellow Crayon
+----drawing a circle on screen with what (Yellow)?
+Screen Circle Crayon Brown Pencil
+----draw what where and with what (color)?
+Screen Circle Crayon Brown Crayon
+----draw what where and with what (color)?
+Screen Circle Crayon Yellow Pencil
+----drawing a circle on screen with what (Yellow)?
+Screen Circle Crayon Yellow Crayon
+----drawing a circle on screen with what (Yellow)?
+Printer Line Pencil Brown Pencil
+----drawing a line on printer with what (Brown)
+Printer Line Pencil Brown Crayon
+----drawing a line on printer with what (Brown)
+Printer Line Pencil Yellow Pencil
+----draw what where and with what (color)?
+Printer Line Pencil Yellow Crayon
+----draw what where and with what (color)?
+Printer Line Crayon Brown Pencil
+----drawing a line on printer with what (Brown)
+Printer Line Crayon Brown Crayon
+----drawing a line on printer with what (Brown)
+Printer Line Crayon Yellow Pencil
+----draw what where and with what (color)?
+Printer Line Crayon Yellow Crayon
+----draw what where and with what (color)?
+Printer Circle Pencil Brown Pencil
+----draw what where and with what (color)?
+Printer Circle Pencil Brown Crayon
+----draw what where and with what (color)?
+Printer Circle Pencil Yellow Pencil
+----drawing a circle on printer with pencil (Yellow)
+Printer Circle Pencil Yellow Crayon
+----draw what where and with what (color)?
+Printer Circle Crayon Brown Pencil
+----draw what where and with what (color)?
+Printer Circle Crayon Brown Crayon
+----drawing a circle on printer with crayon (Brown)
+Printer Circle Crayon Yellow Pencil
+----draw what where and with what (color)?
+Printer Circle Crayon Yellow Crayon
+----draw what where and with what (color)?
+
+---------------------------
+Extended tests
+---------------------------
+
+Test for Boxing an Unboxing
+
+Starting extended test 1
+Screen Line
+draw a line on screen and with what (INTEGER)?
+Screen Line
+draw a line on screen and with what (INTEGER)?
+Screen Circle
+draw what where (INTEGER)?
+Screen Circle
+draw what where (INTEGER)?
+Printer Line
+draw a line on screen and with what (INTEGER)?
+Printer Line
+draw a line on screen and with what (INTEGER)?
+Printer Circle
+draw a circle on screen and with what (INTEGER)?
+Printer Circle
+draw a circle on screen and with what (INTEGER)?
