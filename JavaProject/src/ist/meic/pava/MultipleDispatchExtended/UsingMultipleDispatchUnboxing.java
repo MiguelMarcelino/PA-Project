@@ -64,8 +64,8 @@ public class UsingMultipleDispatchUnboxing {
             return true;
         }).collect(Collectors.toList());
 
+        if (matchingMethods.isEmpty()) throw new NoSuchMethodException();
         Method best = matchingMethods.get(0);
-        if (best == null) throw new NoSuchMethodException();
 
         for (Method method : matchingMethods) {
             int bestPos = 0;

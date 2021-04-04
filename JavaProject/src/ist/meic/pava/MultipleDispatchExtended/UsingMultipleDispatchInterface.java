@@ -7,6 +7,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This class is currently a copy of UsingMultipleDispatch.
+ * It was creates for the purpose of running tests without
+ * having to change the main implementation.
+ */
 public class UsingMultipleDispatchInterface {
 
     /**
@@ -51,8 +56,8 @@ public class UsingMultipleDispatchInterface {
             return true;
         }).collect(Collectors.toList());
 
+        if (matchingMethods.isEmpty()) throw new NoSuchMethodException();
         Method best = matchingMethods.get(0);
-        if (best == null) throw new NoSuchMethodException();
 
         for (Method method : matchingMethods) {
             int bestPos = 0;
