@@ -64,13 +64,13 @@ public class UsingMultipleDispatch {
             for (int i = 0; i < objects.size() && bestPos >= 0 && !isMoreSpecific; i++) {
                 if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                     if (currBestMethodParams[i] != parameterTypes[i])
-                        bestPos = -1;
+                       isMoreSpecific = true;
                 } else {
-                    isMoreSpecific = true;
+                    bestPos = -1;
                 }
             }
 
-            if (bestPos == -1) best = method;
+            if (isMoreSpecific) best = method;
         }
 
         return best;
