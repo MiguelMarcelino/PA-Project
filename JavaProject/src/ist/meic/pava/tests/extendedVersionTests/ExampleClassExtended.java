@@ -55,7 +55,11 @@ public class ExampleClassExtended {
      * Test for interfaces
      */
     public static void exampleExtended3() {
-        UsingMultipleDispatchInterface.invoke(new Screen(), "draw", new TesterClass());
+        // In class Test1, the ITest1 interface is specified first, so methods that have
+        // ITest1 as arguments will be considered as the most specific methods. Same goes
+        // for Test2 but with ITest2 being the most specific one
+        UsingMultipleDispatchInterface.invoke(new Screen(), "draw", new Test1());
+        UsingMultipleDispatchInterface.invoke(new Screen(), "draw", new Test2());
     }
 
 }

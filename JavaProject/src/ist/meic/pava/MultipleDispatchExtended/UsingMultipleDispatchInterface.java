@@ -5,13 +5,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * This class is currently a copy of UsingMultipleDispatch.
- * It was creates for the purpose of running tests without
- * having to change the main implementation.
- */
 public class UsingMultipleDispatchInterface {
 
     /**
@@ -40,6 +36,10 @@ public class UsingMultipleDispatchInterface {
     }
 
     /**
+     * Finds most specific method and takes interfaces into account
+     * It will choose the most specific interface taking the order
+     * of the implements clause into consideration
+     *
      * @param methodList - List of methods to analyze
      * @param objects    - List of parameters from function
      * @return - best method with most specific arguments
@@ -69,7 +69,18 @@ public class UsingMultipleDispatchInterface {
                     if (currBestMethodParams[i] != parameterTypes[i])
                         isMoreSpecific = true;
                 } else {
-                    bestPos = -1;
+                    if (currBestMethodParams[i].isInterface() && parameterTypes[i].isInterface()) {
+                        Optional<Class<?>> oClass = Arrays.stream(objects.get(i).getClass().getInterfaces()).findFirst();
+                        if (oClass.isPresent()) {
+                            if (currBestMethodParams[i] == oClass.get()) {
+                                bestPos = -1;
+                            } else {
+                                isMoreSpecific = true;
+                            }
+                        }
+                    } else {
+                        bestPos = -1;
+                    }
                 }
             }
 

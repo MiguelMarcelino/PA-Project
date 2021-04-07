@@ -203,19 +203,5 @@ draw a circle on printer and with what (INT)?
 draw a circle on printer and with what (INT)?
 
 Test for Interface hierarchy
-- Screen Line Test1
 drawing a line on screen TEST1
-- Screen Line Test2
-draw what where TEST
-- Screen Circle Test1
-draw what where TEST
-- Screen Circle Test2
-draw a circle on screen TEST2
-- Printer Line Test1
-drawing a line on printer TEST
-- Printer Line Test2
-drawing a line on printer TEST
-- Printer Circle Test1
-draw a circle on printer TEST1
-- Printer Circle Test2
-draw what where TEST
+drawing a line on screen TEST2

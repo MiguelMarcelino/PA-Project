@@ -64,7 +64,7 @@ public class UsingMultipleDispatch {
             for (int i = 0; i < objects.size() && bestPos >= 0 && !isMoreSpecific; i++) {
                 if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                     if (currBestMethodParams[i] != parameterTypes[i])
-                       isMoreSpecific = true;
+                        isMoreSpecific = true;
                 } else {
                     bestPos = -1;
                 }

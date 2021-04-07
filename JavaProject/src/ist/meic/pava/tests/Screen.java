@@ -2,7 +2,6 @@ package ist.meic.pava.tests;
 
 import ist.meic.pava.tests.extendedVersionTests.interfaceTests.ITest1;
 import ist.meic.pava.tests.extendedVersionTests.interfaceTests.ITest2;
-import ist.meic.pava.tests.extendedVersionTests.interfaceTests.TesterClass;
 
 public class Screen extends Device{
     // For example 1
@@ -113,6 +112,7 @@ public class Screen extends Device{
     public void draw(Circle l, int i) {
         System.err.println("draw a circle on screen and with what (INT)");
     }
+
 
     // For example extended 3
     public void draw(ITest1 t) {System.err.println("drawing a line on screen TEST1");}
