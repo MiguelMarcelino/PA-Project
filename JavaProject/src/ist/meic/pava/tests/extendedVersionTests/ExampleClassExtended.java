@@ -3,9 +3,7 @@ package ist.meic.pava.tests.extendedVersionTests;
 import ist.meic.pava.MultipleDispatchExtended.UsingMultipleDispatchInterface;
 import ist.meic.pava.MultipleDispatchExtended.UsingMultipleDispatchUnboxing;
 import ist.meic.pava.tests.*;
-import ist.meic.pava.tests.extendedVersionTests.interfaceTests.Test;
-import ist.meic.pava.tests.extendedVersionTests.interfaceTests.Test1;
-import ist.meic.pava.tests.extendedVersionTests.interfaceTests.Test2;
+import ist.meic.pava.tests.extendedVersionTests.interfaceTests.*;
 
 public class ExampleClassExtended {
 
@@ -57,26 +55,7 @@ public class ExampleClassExtended {
      * Test for interfaces
      */
     public static void exampleExtended3() {
-        Device[] devices = new Device[]{new Screen(), new Printer()};
-        Shape[] shapes = new Shape[]{new Line(), new Circle()};
-        Test[] tests = new Test[]{new Test1(), new Test2()};
-        Integer[] arrayInt = {};
-
-        for (Device device : devices) {
-            for (Shape shape : shapes) {
-                for (Test test : tests) {
-                    System.err.println("- " + device.getClass().getSimpleName() + " " +
-                            shape.getClass().getSimpleName() + " " +
-                            test.getClass().getSimpleName());
-                    UsingMultipleDispatchInterface.invoke(device, "draw", shape, test);
-
-                    // tested and working with unboxing and base implementation versions
-                    // Also works with findBestMethodV2
-                    // UsingMultipleDispatchUnboxing.invoke(device, "draw", arrayInt, shape, test);
-                    // UsingMultipleDispatch.invoke(device, "draw", shape, test);
-                }
-            }
-        }
+        UsingMultipleDispatchInterface.invoke(new Screen(), "draw", new TesterClass());
     }
 
 }

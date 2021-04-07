@@ -115,13 +115,6 @@ public class Screen extends Device{
     }
 
     // For example extended 3
-    public void draw(Line l, TesterClass t) {
-        System.err.println("draw a line on screen TESTER");
-    }
-    public void draw(Line l, ITest1 t1) {
-        System.err.println("drawing a line on screen TEST1");
-    }
-    public void draw(Circle l, ITest2 t2) {
-        System.err.println("draw a circle on screen TEST2");
-    }
+    public void draw(ITest1 t) {System.err.println("drawing a line on screen TEST1");}
+    public void draw(ITest2 t) {System.err.println("drawing a line on screen TEST2");}
 }

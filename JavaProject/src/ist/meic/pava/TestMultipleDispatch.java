@@ -7,39 +7,40 @@ import java.io.*;
 
 public class TestMultipleDispatch {
     public static void main(String[] args) {
-        File outputFile = setErrorOutputFile();
+//        File outputFile = setErrorOutputFile();
 
-        System.err.println("Starting test 1");
-        ExampleClass.example1();
-
-        System.err.println("\nStarting test 2");
-        ExampleClass.example2();
-
-        System.err.println("\nStarting test 3");
-        ExampleClass.example3();
-
-        System.err.println("\nStarting test 4");
-        ExampleClass.example4();
-
-        System.err.println("\nStarting test 5");
-        ExampleClass.example5();
-
-        System.err.println("\n---------------------------");
-        System.err.println("Extended tests");
-        System.err.println("---------------------------");
-
-        System.err.println("\nTest for Boxing an Unboxing");
-        System.err.println("\nStarting unboxing test 1");
-        ExampleClassExtended.exampleExtended1();
-
-        System.err.println("\nStarting unboxing test 2");
-        ExampleClassExtended.exampleExtended2();
+//        System.err.println("Starting test 1");
+//        ExampleClass.example1();
+//
+//        System.err.println("\nStarting test 2");
+//        ExampleClass.example2();
+//
+//        System.err.println("\nStarting test 3");
+//        ExampleClass.example3();
+//
+//        System.err.println("\nStarting test 4");
+//        ExampleClass.example4();
+//
+//        System.err.println("\nStarting test 5");
+//        ExampleClass.example5();
+//
+//        System.err.println("\n---------------------------");
+//        System.err.println("Extended tests");
+//        System.err.println("---------------------------");
+//
+//        System.err.println("\nTest for Boxing an Unboxing");
+//        System.err.println("\nStarting unboxing test 1");
+//        ExampleClassExtended.exampleExtended1();
+//
+//        System.err.println("\nStarting unboxing test 2");
+//        ExampleClassExtended.exampleExtended2();
 
         System.err.println("\nTest for Interface hierarchy");
         ExampleClassExtended.exampleExtended3();
 
+
         // compare results of tests to expected results
-        compareTestResults(outputFile);
+//        compareTestResults(outputFile);
     }
 
     /**
