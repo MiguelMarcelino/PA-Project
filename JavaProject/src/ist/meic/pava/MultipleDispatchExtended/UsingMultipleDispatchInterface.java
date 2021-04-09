@@ -70,23 +70,17 @@ public class UsingMultipleDispatchInterface {
                         isMoreSpecific = true;
                 } else {
                     if (currBestMethodParams[i].isInterface() && parameterTypes[i].isInterface()) {
-                        ArrayList<Class> interfaces  = Arrays.stream(objects.get(i).getClass().getInterfaces()).collect(Collectors.toCollection(ArrayList::new));
-                        /*Optional<Class<?>> oClass = Arrays.stream(objects.get(i).getClass().getInterfaces()).findFirst();
-                        if (oClass.isPresent()) {*/
-                            /*if (currBestMethodParams[i] == oClass.get()) {
-                                bestPos = -1;
-                            } else if(parameterTypes[i] == oClass.get()) {
+                        ArrayList<Class> interfaces = Arrays.stream(objects.get(i).getClass().getInterfaces())
+                                .collect(Collectors.toCollection(ArrayList::new));
+                        if (!interfaces.isEmpty()) {
+                            // check if interface of currBestMethod is more specific
+                            if (interfaces.indexOf(currBestMethodParams[i]) < interfaces.indexOf(parameterTypes[i]))
+                                isBest = false;
+                            else
                                 isMoreSpecific = true;
-                            }else{*/
-                        if(!interfaces.isEmpty()){
-                               if(interfaces.indexOf(currBestMethodParams[i]) < interfaces.indexOf(parameterTypes[i]))
-                                   isBest = false;
-                               else
-                                   isMoreSpecific=true;
-                            //}
                         }
                     } else {
-                        isBest=false;
+                        isBest = false;
                     }
                 }
             }

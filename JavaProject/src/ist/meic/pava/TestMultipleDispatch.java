@@ -5,6 +5,11 @@ import ist.meic.pava.tests.extendedVersionTests.ExampleClassExtended;
 
 import java.io.*;
 
+/**
+ * Simple Tests that write results to a file called
+ * test_files/test_results in and compare the results
+ * to expected output stored in test_files/expected_results.
+ */
 public class TestMultipleDispatch {
     public static void main(String[] args) {
         File outputFile = setErrorOutputFile();
