@@ -2,6 +2,7 @@ package ist.meic.pava.tests;
 
 import ist.meic.pava.tests.extendedVersionTests.interfaceTests.ITest1;
 import ist.meic.pava.tests.extendedVersionTests.interfaceTests.ITest2;
+import ist.meic.pava.tests.extendedVersionTests.interfaceTests.ITest3;
 
 public class Screen extends Device{
     // For example 1
@@ -117,4 +118,6 @@ public class Screen extends Device{
     // For example extended 3
     public void draw(ITest1 t) {System.err.println("drawing a line on screen TEST1");}
     public void draw(ITest2 t) {System.err.println("drawing a line on screen TEST2");}
+    public void draw(ITest3 t) {System.err.println("drawing a line on screen TEST3");}
+
 }

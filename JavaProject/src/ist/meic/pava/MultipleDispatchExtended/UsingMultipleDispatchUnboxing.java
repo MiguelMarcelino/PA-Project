@@ -68,11 +68,11 @@ public class UsingMultipleDispatchUnboxing {
         Method best = matchingMethods.get(0);
 
         for (Method method : matchingMethods) {
-            int bestPos = 0;
+            boolean isBest = true;
             boolean isMoreSpecific = false;
             Class[] parameterTypes = method.getParameterTypes();
             Class[] currBestMethodParams = best.getParameterTypes();
-            for (int i = 0; i < objects.size() && (bestPos >= 0 && !isMoreSpecific); i++) {
+            for (int i = 0; i < objects.size() && isBest && !isMoreSpecific; i++) {
                 if (primitivePositions.contains(i)) {
                     // if current best method parameters in i is not primitive but the current
                     // parameter type is, parameterTypes is considered to be more specific
@@ -85,7 +85,7 @@ public class UsingMultipleDispatchUnboxing {
                         if (currBestMethodParams[i] != parameterTypes[i])
                             isMoreSpecific = true;
                     } else {
-                        bestPos = -1;
+                        isBest = false;
                     }
                 }
             }

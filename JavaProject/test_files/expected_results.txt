@@ -203,5 +203,5 @@ draw a circle on printer and with what (INT)?
 draw a circle on printer and with what (INT)?
 
 Test for Interface hierarchy
-drawing a line on screen TEST1
+drawing a line on screen TEST2
 drawing a line on screen TEST2

@@ -60,26 +60,33 @@ public class UsingMultipleDispatchInterface {
         Method best = matchingMethods.get(0);
 
         for (Method method : matchingMethods) {
-            int bestPos = 0;
+            boolean isBest = true;
             boolean isMoreSpecific = false;
             Class[] parameterTypes = method.getParameterTypes();
             Class[] currBestMethodParams = best.getParameterTypes();
-            for (int i = 0; i < objects.size() && bestPos >= 0 && !isMoreSpecific; i++) {
+            for (int i = 0; i < objects.size() && isBest && !isMoreSpecific; i++) {
                 if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                     if (currBestMethodParams[i] != parameterTypes[i])
                         isMoreSpecific = true;
                 } else {
                     if (currBestMethodParams[i].isInterface() && parameterTypes[i].isInterface()) {
-                        Optional<Class<?>> oClass = Arrays.stream(objects.get(i).getClass().getInterfaces()).findFirst();
-                        if (oClass.isPresent()) {
-                            if (currBestMethodParams[i] == oClass.get()) {
+                        ArrayList<Class> interfaces  = Arrays.stream(objects.get(i).getClass().getInterfaces()).collect(Collectors.toCollection(ArrayList::new));
+                        /*Optional<Class<?>> oClass = Arrays.stream(objects.get(i).getClass().getInterfaces()).findFirst();
+                        if (oClass.isPresent()) {*/
+                            /*if (currBestMethodParams[i] == oClass.get()) {
                                 bestPos = -1;
-                            } else {
+                            } else if(parameterTypes[i] == oClass.get()) {
                                 isMoreSpecific = true;
-                            }
+                            }else{*/
+                        if(!interfaces.isEmpty()){
+                               if(interfaces.indexOf(currBestMethodParams[i]) < interfaces.indexOf(parameterTypes[i]))
+                                   isBest = false;
+                               else
+                                   isMoreSpecific=true;
+                            //}
                         }
                     } else {
-                        bestPos = -1;
+                        isBest=false;
                     }
                 }
             }

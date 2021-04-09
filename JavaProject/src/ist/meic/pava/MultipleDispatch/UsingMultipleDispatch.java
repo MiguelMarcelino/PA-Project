@@ -57,16 +57,16 @@ public class UsingMultipleDispatch {
         Method best = matchingMethods.get(0);
 
         for (Method method : matchingMethods) {
-            int bestPos = 0;
+            boolean isBest = true;
             boolean isMoreSpecific = false;
             Class[] parameterTypes = method.getParameterTypes();
             Class[] currBestMethodParams = best.getParameterTypes();
-            for (int i = 0; i < objects.size() && bestPos >= 0 && !isMoreSpecific; i++) {
+            for (int i = 0; i < objects.size() && isBest  && !isMoreSpecific; i++) {
                 if (currBestMethodParams[i].isAssignableFrom(parameterTypes[i])) {
                     if (currBestMethodParams[i] != parameterTypes[i])
                         isMoreSpecific = true;
                 } else {
-                    bestPos = -1;
+                    isBest = false;
                 }
             }
 
