@@ -28,6 +28,7 @@ end
 # Base.getproperty(jv::JCallInfo, sym::Symbol) =getfield(jv, :methods)[sym](getfield(jv, :ref))
 
 # jlM = @jimport java.lang.Math
+methodsDict = Dict()
 function javaImport(fullPath::String)
     # 1) Put methods in dictionary (somehow)
     # 2) Create function called fullPath that calls necessary 
@@ -37,19 +38,18 @@ function javaImport(fullPath::String)
     # j_u_arrays = @jimport java.util.Arrays
     methods() = jcall(class, "getMethods", Vector{JMethod}, ())
 
-    methodsDict = Dict()
+    methods()
 
-    for i in eachindex(methods)
-        method = methods()[i]
-        method()
+    for method in (methods())
+        #method = methods()[i]
+        
         methodName = jcall(method, "getName", JString,())
         methodParameterTypes = jcall(method,"getParameterTypes",Vector{JClass},())
         #dá erro aqui acho eu não percebo bem porque
         get!(methodsDict,Pair(methodName,methodParameterTypes),method)
     end
 end
-    method = methods()[1]
-    method2 = methods()[2]
+
 #(methodsDict,Pair("abs",Vector{classforname("java.lang.Float")}))
 
 
