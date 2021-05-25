@@ -39,6 +39,22 @@ function javaImport(fullPath::String)
 
     methodsDict = Dict()
 
+    for i in eachindex(methods)
+        method = methods()[i]
+        method()
+        methodName = jcall(method, "getName", JString,())
+        methodParameterTypes = jcall(method,"getParameterTypes",Vector{JClass},())
+        #dá erro aqui acho eu não percebo bem porque
+        get!(methodsDict,Pair(methodName,methodParameterTypes),method)
+    end
+end
+    method = methods()[1]
+    method2 = methods()[2]
+#(methodsDict,Pair("abs",Vector{classforname("java.lang.Float")}))
+
+
+    jcall(first, "getName", JString,())
+
     classInfo = JCallInfo(class)
 
     # TODO
