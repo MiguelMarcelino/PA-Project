@@ -5,9 +5,12 @@ using JavaCall
 JavaCall.init(["-Xmx128M"])
 
 struct JCallInfo
-    ref::JClass
+    ref::JavaObject
     methods::Dict
 end
+
+Base.getproperty(jv::JCallInfo, sym::Symbol) =
+            getfield(jv, :methods)[sym](getfield(jv, :ref))
 
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
@@ -25,12 +28,18 @@ function javaImport(alias::String, fullPath::String)
             push!(parameterNames, jcall(name, "getName", JString, ()))
         end
         finalParamNames = tuple(parameterNames...)
-        get!(methodsDict,Pair(methodName,finalParamNames),method)
+        get!(methodsDict,(methodName,finalParamNames),method)
     end
+
+    #Se calhar em vez de ter uma chave desta forma podemos ter apenas o nome da funcao e o value ser um vector de todos as redefiniçoes do metodo
+    #Depois dependendo do que o utilizador colocar nos avaliamos o tipo do argumento e chamamos a função certa
+
+    ret = JCallInfo(class, methodsDict)
 
     get!(importedClasses, alias, JCallInfo(class, methodsDict))
     # Meta.parse(alias * " = 
     #     importedClasses[alias]")
+    return ret
 end
 
 
