@@ -5,22 +5,21 @@ using JavaCall
 JavaCall.init(["-Xmx128M"])
 
 struct JCallInfo
-    ref: JavaObject
+    ref::JClass
     methods::Dict
 end
 
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}
 
-
 # typeMapper = Dict{String, }
 
-function Base.show(io::IO, ::MIME"text/plain", v::Vector{JMethod}) where {T}
-    println(io, "Vector with type $T and elements")
-    for i in eachindex(v)
-        println(io, "  ", v.v[i])
-    end
-end
+# function Base.show(io::IO, ::MIME"text/plain", v::Vector{JMethod}) where {T}
+#     println(io, "Vector with type $T and elements")
+#     for i in eachindex(v)
+#         println(io, "  ", v.v[i])
+#     end
+# end
 
 # Base.show(io::IO, obj::JavaObject) = print(io, jcall(obj, "toString", JString, ()))
 # Base.show(io::IO, obj::Vector{JMethod}) = print(io, jcall(obj, "toString", JString, ()))
@@ -29,41 +28,30 @@ end
 
 # jlM = @jimport java.lang.Math
 methodsDict = Dict()
-function javaImport(fullPath::String)
-    # 1) Put methods in dictionary (somehow)
-    # 2) Create function called fullPath that calls necessary 
-    #    methods from dictionary
 
+function javaImport(fullPath::String)
     class = classforname(fullPath)
-    # j_u_arrays = @jimport java.util.Arrays
     methods() = jcall(class, "getMethods", Vector{JMethod}, ())
 
-    methods()
-
     for method in (methods())
-        #method = methods()[i]
-        
         methodName = jcall(method, "getName", JString,())
-        methodParameterTypes = jcall(method,"getParameterTypes",Vector{JClass},())
-        #dá erro aqui acho eu não percebo bem porque
-        get!(methodsDict,Pair(methodName,methodParameterTypes),method)
+        methodParameterTypes() = jcall(method,"getParameterTypes",Vector{JClass},())
+        parameterNames = []
+        for name in (methodParameterTypes())
+            push!(parameterNames, jcall(name, "getName", JString, ()))
+        end
+        finalParamNames = tuple(parameterNames...)
+        get!(methodsDict,Pair(methodName,finalParamNames),method)
     end
 end
 
-#(methodsDict,Pair("abs",Vector{classforname("java.lang.Float")}))
+math = JCallInfo(class, methodsDict)
+math.abs(4)
+#get(methodsDict,Pair("abs",Vector{classforname("java.lang.Float")}))
 
+# jcall(first, "getName", JString,())
+# classInfo = JCallInfo(class)
 
-    jcall(first, "getName", JString,())
-
-    classInfo = JCallInfo(class)
-
-    # TODO
-    Meta.parse(fullPath * "(methodName, args...) = {
-        
-    }")
-    
-# function typeMapper(javaType::String) {
-# }
-
-
-# jcall(jlM, "sin", jdouble, (jdouble,), pi/2)
+# TODO
+# Meta.parse(fullPath * "(methodName, args...) = {
+# }")
