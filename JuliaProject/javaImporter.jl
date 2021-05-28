@@ -10,7 +10,7 @@ struct JCallInfo
 end
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
-            getfield(jv, :methods)[sym](getfield(jv, :ref))
+            getfield(jv, :methods)[String(sym)]
 
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
@@ -27,8 +27,14 @@ function javaImport(alias::String, fullPath::String)
         for name in (methodParameterTypes())
             push!(parameterNames, jcall(name, "getName", JString, ()))
         end
+        
+        
+        functionsArray = get(methodsDict,methodName,[])
+       
         finalParamNames = tuple(parameterNames...)
-        get!(methodsDict,(methodName,finalParamNames),method)
+        push!(functionsArray,(finalParamNames, method))
+        delete!(methodsDict,methodName)
+        get!(methodsDict,methodName,functionsArray)
     end
 
     #Se calhar em vez de ter uma chave desta forma podemos ter apenas o nome da funcao e o value ser um vector de todos as redefiniçoes do metodo
@@ -41,6 +47,65 @@ function javaImport(alias::String, fullPath::String)
     #     importedClasses[alias]")
     return ret
 end
+
+function selectBestMethod(methods::Vector, values::Any...)
+    print(values)
+    print(values[1])
+end
+
+function findBestMethod(methods::Vector, values::Any...)
+    finalMethod =""
+    valid = true
+    for method in methods
+        for i in eachindex(method[1])
+            if !compareTypes(method[1][i],values[i])
+                valid = false
+                break
+            end
+        end
+        if(valid)
+            finalMethod = method[2]
+        end
+        valid = true
+    end
+    print(finalMethod isa JMethod)
+    return finalMethod
+end
+
+function compareTypes(javaType::Any,juliaType::Any)
+    if juliaType isa jboolean
+        if javaType == "boolean"
+            return true
+        end
+    end
+    if juliaType isa jchar
+        if javaType == "char"
+            return true
+        end
+    end
+    if juliaType isa jint
+        if javaType == "int"
+            return true
+        end
+    end
+    if juliaType isa jlong
+        if javaType == "long"
+            return true
+        end
+    end
+    if juliaType isa jfloat
+        if javaType == "float"
+            return true
+        end
+    end
+    if juliaType isa jdouble
+        if javaType == "double"
+            return true
+        end
+    end
+    return false
+end
+
 
 
 #get(methodsDict,Pair("abs",Vector{classforname("java.lang.Float")}))
