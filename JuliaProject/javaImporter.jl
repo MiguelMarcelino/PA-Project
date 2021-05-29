@@ -68,7 +68,7 @@ function findBestMethod(methods::Vector, values::Any...)
         end
         valid = true
     end
-    print(finalMethod isa JMethod)
+   
     return finalMethod
 end
 
