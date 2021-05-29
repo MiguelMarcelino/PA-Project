@@ -15,6 +15,8 @@ Base.getproperty(jv::JCallInfo, sym::Symbol) =
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
 
+# to call= jcall(math.ref,method,args)
+
 function javaImport(alias::String, fullPath::String)
     class = classforname(fullPath)
     methods() = jcall(class, "getMethods", Vector{JMethod}, ())
