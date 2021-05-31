@@ -10,7 +10,7 @@ struct JCallInfo
 end
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
-            getfield(jv, :methods)[String(sym)]
+            findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],ARGS::Array{String})
 
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
@@ -55,7 +55,8 @@ function selectBestMethod(methods::Vector, values::Any...)
     print(values[1])
 end
 
-function findBestMethod(methods::Vector, values::Any...)
+function findBestMethod(class::JavaObject,methods::Vector, values::Any...)
+    print(values)
     finalMethod =""
     valid = true
     for method in methods
@@ -71,7 +72,8 @@ function findBestMethod(methods::Vector, values::Any...)
         valid = true
     end
    
-    return finalMethod
+    value = jcall(class,finalMethod,values...)
+    return value
 end
 
 function compareTypes(javaType::Any,juliaType::Any)
