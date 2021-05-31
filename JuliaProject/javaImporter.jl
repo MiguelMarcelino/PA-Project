@@ -10,7 +10,7 @@ struct JCallInfo
 end
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
-            findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],ARGS::Array{String})
+            (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
@@ -30,7 +30,6 @@ function javaImport(alias::String, fullPath::String)
             push!(parameterNames, jcall(name, "getName", JString, ()))
         end
         
-        
         functionsArray = get(methodsDict,methodName,[])
        
         finalParamNames = tuple(parameterNames...)
@@ -39,26 +38,16 @@ function javaImport(alias::String, fullPath::String)
         get!(methodsDict,methodName,functionsArray)
     end
 
-    #Se calhar em vez de ter uma chave desta forma podemos ter apenas o nome da funcao e o value ser um vector de todos as redefiniçoes do metodo
-    #Depois dependendo do que o utilizador colocar nos avaliamos o tipo do argumento e chamamos a função certa
-
     ret = JCallInfo(class, methodsDict)
-
     get!(importedClasses, alias, JCallInfo(class, methodsDict))
-    # Meta.parse(alias * " = 
-    #     importedClasses[alias]")
     return ret
 end
 
-function selectBestMethod(methods::Vector, values::Any...)
-    print(values)
-    print(values[1])
-end
 
 function findBestMethod(class::JavaObject,methods::Vector, values::Any...)
-    print(values)
     finalMethod =""
     valid = true
+
     for method in methods
         for i in eachindex(method[1])
             if !compareTypes(method[1][i],values[i])
@@ -71,7 +60,9 @@ function findBestMethod(class::JavaObject,methods::Vector, values::Any...)
         end
         valid = true
     end
-   
+    if(finalMethod == "") 
+        return "No Such Method"
+    end        
     value = jcall(class,finalMethod,values...)
     return value
 end
