@@ -9,6 +9,7 @@ struct JCallInfo
     methods::Dict
 end
 
+#Esta a dar erro se for sem parametros por exemplo import java.time.LocalDate   date.now()
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
