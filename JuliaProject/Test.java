@@ -1,4 +1,5 @@
 import java.lang.reflect.Method;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -10,7 +11,7 @@ public class Test {
         methods[0].getParameterTypes();
         methods[0].getParameterTypes();
         Math.class.getMethods();
-        LocalDate.now().plusDays(12);
+        LocalDate.now(Clock.systemUTC());
         // Class.forName("java.lang.Math");
     }
 
