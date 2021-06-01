@@ -1,11 +1,9 @@
-# include("/home/miguel/Desktop/PA/PA-Project/JuliaProject/javaImporter.jl")
-
 using JavaCall
 
 JavaCall.init(["-Xmx128M"])
 
 struct JCallInfo
-    # ref::JavaObject
+    ref::JavaObject
     methods::Dict
 end
 
@@ -14,11 +12,11 @@ end
 
 #Temos de tentar com objetos e com as subclasses e superclasses
 
-# Base.getproperty(jv::JCallInfo, sym::Symbol) =
-#             (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
-
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
-            (values...)->findBestMethod(jv,getfield(jv, :methods)[String(sym)],values...)
+             (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
+
+Base.getproperty(jv::JavaObject, sym::Symbol) =
+            (values...)->findBestMethod(jv,getfield(importedMethods[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
 # Stores class alias as key and JCallInfo as class information
 # importedClasses = Dict{String, JCallInfo}()
@@ -47,8 +45,8 @@ function javaImport(fullPath::String)
         get!(methodsDict,methodName,functionsArray)
     end
 
-    ret = JCallInfo(methodsDict)
-    get!(importedClasses, class, ret)
+    ret = JCallInfo(class, methodsDict)
+    get!(importedClasses, fullPath, ret)
     return ret
 end
 
@@ -113,13 +111,6 @@ function compareTypes(javaType::Any,juliaType::Any)
     return false
 end
 
-
-
-#get(methodsDict,Pair("abs",Vector{classforname("java.lang.Float")}))
-
-# jcall(first, "getName", JString,())
-# classInfo = JCallInfo(class)
-
-# TODO
-# Meta.parse(fullPath * "(methodName, args...) = {
-# }")
+time = javaImport("java.time.LocalDate")
+now = time.now()
+now.plusDays(4)
