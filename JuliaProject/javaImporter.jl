@@ -5,26 +5,28 @@ using JavaCall
 JavaCall.init(["-Xmx128M"])
 
 struct JCallInfo
-    ref::JavaObject
+    # ref::JavaObject
     methods::Dict
 end
 
-Base.show(io::IO, obj::JavaObject) =
-            print(io, jcall(obj, "toString", JString, ()))
+# Base.show(io::IO, obj::JavaObject) =
+#             print(io, jcall(obj, "toString", JString, ()))
 
 #Temos de tentar com objetos e com as subclasses e superclasses
 
-#Esta a dar erro se for sem parametros por exemplo import java.time.LocalDate   date.now()
-Base.getproperty(jv::JCallInfo, sym::Symbol) =
-            (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
+# Base.getproperty(jv::JCallInfo, sym::Symbol) =
+#             (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
+Base.getproperty(jv::JCallInfo, sym::Symbol) =
+            (values...)->findBestMethod(jv,getfield(jv, :methods)[String(sym)],values...)
 
 # Stores class alias as key and JCallInfo as class information
-importedClasses = Dict{String, JCallInfo}()
+# importedClasses = Dict{String, JCallInfo}()
+importedClasses = Dict{JavaObject, JCallInfo}()
 
 # to call= jcall(math.ref,method,args)
 
-function javaImport(alias::String, fullPath::String)
+function javaImport(fullPath::String)
     class = classforname(fullPath)
     methods() = jcall(class, "getMethods", Vector{JMethod}, ())
     methodsDict = Dict()
@@ -45,14 +47,19 @@ function javaImport(alias::String, fullPath::String)
         get!(methodsDict,methodName,functionsArray)
     end
 
-    ret = JCallInfo(class, methodsDict)
-    get!(importedClasses, alias, JCallInfo(class, methodsDict))
+    ret = JCallInfo(methodsDict)
+    get!(importedClasses, class, ret)
     return ret
 end
 
 
 function findBestMethod(class::JavaObject,methods::Vector, values::Any...)
+    if(isempty(methods)) 
+        return "No Such Method"
+    end
+
     finalMethod = methods[1][2]
+
     valid = true
     if(!isempty(values))
         for method in methods
@@ -67,9 +74,6 @@ function findBestMethod(class::JavaObject,methods::Vector, values::Any...)
             end
             valid = true
         end
-        if(finalMethod == "") 
-            return "No Such Method"
-        end        
     end 
     value = jcall(class,finalMethod,values...)
     return value
