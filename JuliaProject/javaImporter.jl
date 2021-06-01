@@ -16,11 +16,12 @@ Base.getproperty(jv::JCallInfo, sym::Symbol) =
              (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
 Base.getproperty(jv::JavaObject, sym::Symbol) =
-            (values...)->findBestMethod(jv,getfield(importedMethods[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
+            print(jcall(jv, "toString", JString, ()))
+            (values...)->findBestMethod(jv,getfield(importedMethods[jcall(jv, "getClassName", JString, ())], :methods)[String(sym)],values...)
 
 # Stores class alias as key and JCallInfo as class information
 # importedClasses = Dict{String, JCallInfo}()
-importedClasses = Dict{JavaObject, JCallInfo}()
+importedClasses = Dict{String, JCallInfo}()
 
 # to call= jcall(math.ref,method,args)
 
