@@ -9,9 +9,15 @@ struct JCallInfo
     methods::Dict
 end
 
+Base.show(io::IO, obj::JavaObject) =
+            print(io, jcall(obj, "toString", JString, ()))
+
+#Temos de tentar com objetos e com as subclasses e superclasses
+
 #Esta a dar erro se for sem parametros por exemplo import java.time.LocalDate   date.now()
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...)->findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
+
 
 # Stores class alias as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
@@ -46,24 +52,25 @@ end
 
 
 function findBestMethod(class::JavaObject,methods::Vector, values::Any...)
-    finalMethod =""
+    finalMethod = methods[1][2]
     valid = true
-
-    for method in methods
-        for i in eachindex(method[1])
-            if !compareTypes(method[1][i],values[i])
-                valid = false
-                break
+    if(!isempty(values))
+        for method in methods
+            for i in eachindex(method[1])
+                if !compareTypes(method[1][i],values[i])
+                    valid = false
+                    break
+                end
             end
+            if(valid)
+                finalMethod = method[2]
+            end
+            valid = true
         end
-        if(valid)
-            finalMethod = method[2]
-        end
-        valid = true
-    end
-    if(finalMethod == "") 
-        return "No Such Method"
-    end        
+        if(finalMethod == "") 
+            return "No Such Method"
+        end        
+    end 
     value = jcall(class,finalMethod,values...)
     return value
 end
