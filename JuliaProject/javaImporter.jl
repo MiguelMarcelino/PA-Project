@@ -10,17 +10,18 @@ end
 # Stores class full path as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
 
-Base.show(io::IO, jv::JCallInfo) =
-    show(io, getfield(jv, :ref))
+#Base.show(io::IO, jv::JCallInfo) =
+#    show(io, getfield(jv, :ref))
 
-Base.getproperty(jv::JCallInfo, sym::Symbol) =
+
+_getproperty(jv::JCallInfo, sym::Symbol, values::Any...) =  
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
 # javaImport da erro com isto
-Base.getproperty(jv::JavaObject, sym::Symbol) = 
+_getproperty(jv::JavaObject, sym::Symbol, values::Any...) = 
             (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
-            
-#(values...)->findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
+
+Base.getproperty(jv::Any, sym::Symbol) = (values...) -> _getproperty(jv, sym, values...)
 
 function javaImport(fullPath::String)
     class = classforname(fullPath)
@@ -50,7 +51,7 @@ function javaImport(fullPath::String)
 end
 
 
-function findBestMethod(class::JClass, methods::Vector, values::Any...)
+function findBestMethod(class::JavaObject, methods::Vector, values::Any...)
     if(isempty(methods)) 
         return "No Such Method"
     end
@@ -122,7 +123,7 @@ end
 
 time = javaImport("java.time.LocalDate")
 now = time.now()
-# now.plusDays(4)
+now.plusDays(4)
 
 
 # TODO
