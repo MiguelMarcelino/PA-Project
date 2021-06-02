@@ -7,23 +7,39 @@ struct JCallInfo
     methods::Dict
 end
 
+struct JBestMethod
+    #bestObject::JavaObject
+    fullPath::String
+end
+
 # Stores class full path as key and JCallInfo as class information
 importedClasses = Dict{String, JCallInfo}()
 
 #Base.show(io::IO, jv::JCallInfo) =
 #    show(io, getfield(jv, :ref))
 
-
-_getproperty(jv::JCallInfo, sym::Symbol, values::Any...) =  
-            (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
+#_getproperty(jv::JCallInfo, sym::Symbol, values::Any...) =  
+#            (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
 # javaImport da erro com isto
-_getproperty(jv::JavaObject, sym::Symbol, values::Any...) = 
-            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
+#_getproperty(jv::JavaObject, sym::Symbol, values::Any...) = 
+#            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
-Base.getproperty(jv::Any, sym::Symbol) = (values...) -> _getproperty(jv, sym, values...)
+Base.getproperty(jv::JCallInfo, sym::Symbol) =
+            (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
+
+#Base.getproperty(jv::JBestMethod, sym::Symbol) = 
+#            importedClasses[getfield(jv,:fullPath)]
+
+#Base.getproperty(jv::JavaObject, sym::Symbol) = print(typeof(sym))
+#            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
 function javaImport(fullPath::String)
+    elem = get(importedClasses, fullPath, ())
+    if(!isempty(elem)) 
+        return elem
+    end
+
     class = classforname(fullPath)
     methods() = jcall(class, "getMethods", Vector{JMethod}, ())
     methodsDict = Dict()
@@ -58,7 +74,7 @@ function findBestMethod(class::JavaObject, methods::Vector, values::Any...)
 
     finalMethod = methods[1][2]
     valid = true
-    parsedMethods = [] 
+    parsedMethods = []
 
     # remove all elements that don't match required length
     for method in methods
@@ -82,7 +98,7 @@ function findBestMethod(class::JavaObject, methods::Vector, values::Any...)
         valid = true
     end
 
-    value = jcall(class,finalMethod,values...)
+    value = JCallInfo(jcall(class,finalMethod,values...), getfield((importedClasses[jcall(class, "getName", JString,())]), :methods))
     return value
 end
 
@@ -123,6 +139,11 @@ end
 
 time = javaImport("java.time.LocalDate")
 now = time.now()
+now.plusDays(4)
+of = time.of(...)
+
+
+time2 = javaImport("java.time.LocalDate") # Nao devia ser possivel
 now.plusDays(4)
 
 

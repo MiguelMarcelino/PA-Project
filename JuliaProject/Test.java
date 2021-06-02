@@ -11,7 +11,9 @@ public class Test {
         methods[0].getParameterTypes();
         methods[0].getParameterTypes();
         Math.class.getMethods();
-        LocalDate.now(Clock.systemUTC());
+        LocalDate l = LocalDate.now(Clock.systemUTC());
+        LocalDate.class.getName();
+        LocalDate.of(2002, 12, 11);
         // Class.forName("java.lang.Math");
     }
 
