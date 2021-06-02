@@ -27,7 +27,7 @@ importedClasses = Dict{String, JCallInfo}()
 #            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
 Base.show(io::IO, jv::JCallInfo) =
-            if(typeof(getfield(jv, :ref))<:JavaObject)
+            if(typeof(getfield(jv, :ref)) <: JavaObject)
                 show(io, jcall(getfield(jv, :ref), "toString", JString, ()))
             else
                 show(io, getfield(jv, :ref))
@@ -46,10 +46,8 @@ Base.getproperty(jv::JCallInfo, sym::Symbol) =
 #            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
 function javaImport(fullPath::String)
-
     elem = get(importedClasses, fullPath, ())
     if(elem!=())
-        print("asda") 
         return elem
     end
 
@@ -65,7 +63,7 @@ function javaImport(fullPath::String)
         for name in (methodParameterTypes())
             push!(parameterNames, jcall(name, "getName", JString, ()))
         end
-        
+
         functionsArray = get(methodsDict,methodName,[])
        
         finalParamNames = tuple(parameterNames...)
@@ -79,27 +77,42 @@ function javaImport(fullPath::String)
     return ret
 end
 
+function newInstance(ji::JCallInfo, values::Any...) 
+    class = getfield(ji, :ref)
+    types = []
+    for value in values
+        push!(types, typeof(value))
+    end
+
+    methodTypes = tuple(types...)
+    class(methodTypes, values...)
+end
 
 function findBestMethod(class::Any, methods::Vector, values::Any...)
     if(isempty(methods)) 
         return "No Such Method"
     end
 
-    finalMethod = methods[1][2]
-    valid = true
-    parsedMethods = []
-
-    # remove all elements that don't match required length
-    for method in methods
-        if(length(method[1]) == length(values))
-            push!(parsedMethods, method)
+    # consider our own structure as input
+    parsedValues = []
+    for value in values
+        if(typeof(value) <: JCallInfo)
+            push!(parsedValues, getfield(value, :ref))
+        else
+            push!(parsedValues, value)
         end
     end
 
-    for method in parsedMethods
+    finalMethod = methods[1][2]
+    valid = true
+
+    for method in methods
+        if(length(method[1]) != length(parsedValues))
+            continue
+        end
         if(!isempty(method[1]))
             for i in eachindex(method[1])
-                if !compareTypes(method[1][i],values[i])
+                if !compareTypes(method[1][i],parsedValues[i])
                     valid = false
                     break
                 end
@@ -110,12 +123,12 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
         end
         valid = true
     end
-    
-    value = jcall(class,finalMethod,values...)
+
+    value = jcall(class, finalMethod, parsedValues...)
     if(typeof(class)!=JClass)
         class = jcall(class,"getClass",JClass,())
     end
-    
+
     return_value = JCallInfo(value, getfield((importedClasses[jcall(class, "getCanonicalName", JString,())]), :methods))
     return return_value
 end
@@ -155,7 +168,6 @@ function compareTypes(javaType::Any,juliaType::Any)
 end
 
 
-
 time = javaImport("java.time.LocalDate")
 now = time.now()
 now.plusDays(4)
@@ -163,9 +175,12 @@ now.plusDays(4)
 math = javaImport("java.lang.Math")
 math.abs(-1)
 
-time2 = javaImport("java.time.LocalDate") # Nao devia ser possivel
+#time2 = javaImport("java.time.LocalDate")
 now.plusDays(4).plusDays(2).plusDays(4)
 
+date = javaImport("java.util.Date")
+newDate = newInstance(date)
+date.getTime()
 
 # TODO
 # - Temos de tentar com objetos e com as subclasses e superclasses
