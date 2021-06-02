@@ -25,6 +25,9 @@ importedClasses = Dict{String, JCallInfo}()
 #_getproperty(jv::JavaObject, sym::Symbol, values::Any...) = 
 #            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
+Base.show(io::IO, jv::JCallInfo) =
+            show(io, jcall(getfield(jv, :ref), "toString", JString, ()))
+
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
@@ -35,8 +38,10 @@ Base.getproperty(jv::JCallInfo, sym::Symbol) =
 #            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
 function javaImport(fullPath::String)
+
     elem = get(importedClasses, fullPath, ())
-    if(!isempty(elem)) 
+    if(elem!=())
+        print("asda") 
         return elem
     end
 
@@ -97,9 +102,14 @@ function findBestMethod(class::JavaObject, methods::Vector, values::Any...)
         end
         valid = true
     end
-
-    value = JCallInfo(jcall(class,finalMethod,values...), getfield((importedClasses[jcall(class, "getName", JString,())]), :methods))
-    return value
+   #este primeiro tem que ser para dos estaticos
+    # value = jcall(class,finalMethod,values...)
+    value = jcall(class,finalMethod,values...)
+    if(typeof(class)!=JClass)
+        class = jcall(class,"getClass",JClass,())
+    end
+    return_value = JCallInfo(value, getfield((importedClasses[jcall(class, "getCanonicalName", JString,())]), :methods))
+    return return_value
 end
 
 function compareTypes(javaType::Any,juliaType::Any)
@@ -137,11 +147,13 @@ function compareTypes(javaType::Any,juliaType::Any)
 end
 
 
+
 time = javaImport("java.time.LocalDate")
 now = time.now()
 now.plusDays(4)
-of = time.of(...)
 
+math = javaImport("java.lang.Math")
+math.abs(-1)
 
 time2 = javaImport("java.time.LocalDate") # Nao devia ser possivel
 now.plusDays(4)
