@@ -1,9 +1,10 @@
+using JavaCall: isprimitive
 using JavaCall
 
 JavaCall.init(["-Xmx128M"])
 
 struct JCallInfo
-    ref::JavaObject
+    ref::Any
     methods::Dict
 end
 
@@ -26,7 +27,14 @@ importedClasses = Dict{String, JCallInfo}()
 #            (values...) -> findBestMethod(jv,getfield(importedClasses[jcall(jv, "getName", JString, ())], :methods)[String(sym)],values...)
 
 Base.show(io::IO, jv::JCallInfo) =
-            show(io, jcall(getfield(jv, :ref), "toString", JString, ()))
+            if(typeof(getfield(jv, :ref))<:JavaObject)
+                show(io, jcall(getfield(jv, :ref), "toString", JString, ()))
+            else
+                show(io, getfield(jv, :ref))
+            end
+
+           
+
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
@@ -72,7 +80,7 @@ function javaImport(fullPath::String)
 end
 
 
-function findBestMethod(class::JavaObject, methods::Vector, values::Any...)
+function findBestMethod(class::Any, methods::Vector, values::Any...)
     if(isempty(methods)) 
         return "No Such Method"
     end
@@ -102,12 +110,12 @@ function findBestMethod(class::JavaObject, methods::Vector, values::Any...)
         end
         valid = true
     end
-   #este primeiro tem que ser para dos estaticos
-    # value = jcall(class,finalMethod,values...)
+    
     value = jcall(class,finalMethod,values...)
     if(typeof(class)!=JClass)
         class = jcall(class,"getClass",JClass,())
     end
+    
     return_value = JCallInfo(value, getfield((importedClasses[jcall(class, "getCanonicalName", JString,())]), :methods))
     return return_value
 end
@@ -156,7 +164,7 @@ math = javaImport("java.lang.Math")
 math.abs(-1)
 
 time2 = javaImport("java.time.LocalDate") # Nao devia ser possivel
-now.plusDays(4)
+now.plusDays(4).plusDays(2).plusDays(4)
 
 
 # TODO
