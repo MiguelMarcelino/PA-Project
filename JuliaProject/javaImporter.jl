@@ -7,8 +7,6 @@ JavaCall.init(["-Xmx128M"])
 macro javaimport(name::Any)
     if(typeof(name) != String)
         return "Please supply the name of the class to import as a String"
-    elseif(isempty(name))
-        return "Please provide a name to import the class"
     else
         return javaimport(name)
     end
@@ -23,7 +21,8 @@ struct JCallInfo
     methods::Dict
 end
 
-# Stores class full path as key and JCallInfo as class information
+# Stores class full path as key and JCallInfo as class
+# information
 importedclasses = Dict{String, JCallInfo}()
 
 Base.show(io::IO, jv::JCallInfo) =
@@ -36,6 +35,9 @@ Base.show(io::IO, jv::JCallInfo) =
             else
                 show(io, showJuliaType(getfield(jv, :ref)))
             end
+            
+# Base.show(io::IO, jv::JavaCall.JavaCallError) =
+#             show(io, jv.msg)
 
 # Base.show(io::IO, nt::JavaCall.JavaCallError) = show(io, nt.msg)
 
@@ -47,6 +49,9 @@ function javaimport(fullPath::String)
     elem = get(importedclasses, fullPath, ())
     if(elem!=())
         return elem
+    end
+    if(isempty(fullPath))
+        return "Please provide a name for the class import"
     end
 
     originalRef = JavaCall.jimport(fullPath)
@@ -158,6 +163,10 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
     return return_value
 end
 
+##############################################################
+######################### Converters #########################
+##############################################################
+
 function compareTypes(javaType::Any,juliaType::Any)
     if juliaType isa jboolean
         if javaType == "boolean"
@@ -228,6 +237,38 @@ function convertToJavaType(type::Any)
     return type
 end
 
+function primitiveToObject(object::Any) 
+    if typeof(object) == String
+        string = @javaimport "java.lang.String"
+        return newInstance(string, object)
+    end
+    if(typeof(object) == UInt8)
+        boolean = @javaimport "java.lang.Boolean"
+        return newInstance(boolean, object)
+    end
+    if(typeof(object) == UInt16 || typeof(object) == Char)
+        character = @javaimport "java.lang.Character"
+        return newInstance(character, object)
+    end
+    if(typeof(object) == Int32)
+        integer = @javaimport "java.lang.Integer"
+        return newInstance(integer, object)
+    end
+    if(typeof(object) == Int64)
+        long = @javaimport "java.lang.Long"
+        return newInstance(long, object)
+    end
+    if(typeof(object) == Float32)
+        float = @javaimport "java.lang.Float"
+        return newInstance(float, object)
+    end
+    if(typeof(object) == Float64)
+        double = @javaimport "java.lang.Double"
+        return newInstance(double, object)
+    end
+    return object
+end
+
 function showJuliaType(type::Any)
     if typeof(type) == UInt8
         return Bool(type)
@@ -275,13 +316,12 @@ testReplace = concatConcat.replace('d', 'c')
 
 boolean = @javaimport "java.lang.Boolean"
 booleanConstr = newInstance(boolean, "false")
-# boolean.FALSE() # static fields. Should we deal with this?
 
 integer = @javaimport "java.lang.Integer"
 intConstructor = newInstance(integer, Int32(1))
 
 newList = newInstance(list)
-newList.add(intConstructor)
+newList.add(primitiveToObject(1))
 newList.add(booleanConstr) # lista é generica e permite isto
 
 ##############################################################
@@ -295,7 +335,8 @@ newList.add(booleanConstr) # lista é generica e permite isto
 # - Quando criamos listas elas sao do tipo generico. Ou seja, 
 #   aceitam qualquer tipo de objetos. Devemos permitir isso?
 # - Devemos fazer conversao de tipos primitivos para objetos
-#   por exemplo no caso das listas
+#   por exemplo no caso das listas?
+# - primitiveToObject podia ser uma macro?
 
 
 ##############################################################
