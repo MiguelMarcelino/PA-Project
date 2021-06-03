@@ -4,6 +4,16 @@ using JavaCall
 
 JavaCall.init(["-Xmx128M"])
 
+macro jimport(name::Any)
+    if(typeof(name) != String)
+        return "Please supply the name of the class to import as a String"
+    elseif(isempty(name))
+        return "Please provide a name to import the class"
+    else
+        return javaimport(name)
+    end
+end
+
 # Stores a class reference (:ref) and Stores
 # the original reference (:originalRed) to the
 # object, so that its constructor can be called later
@@ -14,7 +24,7 @@ struct JCallInfo
 end
 
 # Stores class full path as key and JCallInfo as class information
-importedClasses = Dict{String, JCallInfo}()
+importedclasses = Dict{String, JCallInfo}()
 
 Base.show(io::IO, jv::JCallInfo) =
             if(typeof(getfield(jv, :ref)) <: JavaObject)
@@ -27,13 +37,14 @@ Base.show(io::IO, jv::JCallInfo) =
                 show(io, showJuliaType(getfield(jv, :ref)))
             end
 
-Base.show(io::IO, nt::Nothing) = show(io, "Nothing")
+Base.show(io::IO, nt::JavaCall.JavaCallError) = show(io, nt.msg)
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
-function javaImport(fullPath::String)
-    elem = get(importedClasses, fullPath, ())
+
+function javaimport(fullPath::String)
+    elem = get(importedclasses, fullPath, ())
     if(elem!=())
         return elem
     end
@@ -65,7 +76,7 @@ function javaImport(fullPath::String)
     end
 
     ret = JCallInfo(classRef, originalRef, methodsDict)
-    get!(importedClasses, fullPath, ret)
+    get!(importedclasses, fullPath, ret)
     return ret
 end
 
@@ -125,7 +136,7 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
         classobject = jcall(class,"getClass",JClass,())
     end
 
-    object = importedClasses[jcall(classobject, "getCanonicalName", JString,())]
+    object = importedclasses[jcall(classobject, "getCanonicalName", JString,())]
     return_value = JCallInfo(convertToJavaType(value), getfield(object,:originalRef), getfield(object,:methods))
 
     return return_value
@@ -208,41 +219,42 @@ end
 ########################### Tests ############################
 ##############################################################
 
-time = javaImport("java.time.LocalDate")
+time = @jimport "java.time.LocalDate"
 now = time.now()
 now.plusDays(4)
 
-math = javaImport("java.lang.Math")
+math = @jimport "java.lang.Math"
 math.abs(-1)
 
-time2 = javaImport("java.time.LocalDate")
+time2 = @jimport "java.time.LocalDate"
 now.plusDays(4).plusDays(2).plusDays(4)
 
-date = javaImport("java.util.Date")
+date = @jimport "java.util.Date"
 newDate = newInstance(date)
 newDate.getTime()
 newDate.getDay()
 
-hashMap = javaImport("java.util.HashMap")
+hashMap = @jimport "java.util.HashMap"
 jmap = newInstance(hashMap)
 jmap.put("ola", "adeus")
 
-url = javaImport("java.net.URL")
+url = @jimport "java.net.URL"
 newUrl = newInstance(url, "http://www.google.com")
 
-list = javaImport("java.util.ArrayList")
+list = @jimport "java.util.ArrayList"
 arrList = newInstance(list)
 arrList.add("ola")
 arrList.get(0)
 
-string = javaImport("java.lang.String")
+string = @jimport "java.lang.String"
 newstr = newInstance(string, "ola")
 concatenated = newstr.concat("olaaaa")
-concatenated.concat("dfudfhd")
+concatConcat = concatenated.concat("dfudfhd")
+testReplace = concatConcat.replace('d', 'c')
 
-boolean = javaImport("java.lang.Boolean")
+boolean = @jimport "java.lang.Boolean"
 booleanConstr = newInstance(boolean, "false")
-boolean.FALSE() # static fields. Should we deal with this?
+# boolean.FALSE() # static fields. Should we deal with this?
 
 
 ##############################################################
