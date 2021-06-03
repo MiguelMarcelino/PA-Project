@@ -4,7 +4,7 @@ using JavaCall
 
 JavaCall.init(["-Xmx128M"])
 
-macro jimport(name::Any)
+macro javaimport(name::Any)
     if(typeof(name) != String)
         return "Please supply the name of the class to import as a String"
     elseif(isempty(name))
@@ -37,7 +37,7 @@ Base.show(io::IO, jv::JCallInfo) =
                 show(io, showJuliaType(getfield(jv, :ref)))
             end
 
-Base.show(io::IO, nt::JavaCall.JavaCallError) = show(io, nt.msg)
+# Base.show(io::IO, nt::JavaCall.JavaCallError) = show(io, nt.msg)
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
@@ -102,14 +102,19 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
     parsedValues = []
     for value in values
         if(typeof(value) <: JCallInfo)
-            push!(parsedValues, getfield(value, :ref))
+            push!(parsedValues, convertToJavaType(getfield(value, :ref)))
         else
-            push!(parsedValues, value)
+            push!(parsedValues, convertToJavaType(value))
         end
     end
+    # print(parsedValues)
 
     finalMethod = methods[1][2]
     valid = true
+
+    # debug
+    # print(methods)
+    # print("\n")
 
     for method in methods
         if(length(method[1]) != length(parsedValues))
@@ -117,7 +122,14 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
         end
         if(!isempty(method[1]))
             for i in eachindex(method[1])
-                if !compareTypes(method[1][i],parsedValues[i])
+                # debug
+                # print("Java Type: ")
+                # print(method[1][i])
+                # print("\n")
+                # print("Julia Type: ")
+                # print(typeof(parsedValues[i]))
+                # print("\n")
+                if !compareTypes(method[1][i],typeof(parsedValues[i]))
                     valid = false
                     break
                 end
@@ -128,6 +140,10 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
         end
         valid = true
     end
+
+    # debug
+    # print("\n")
+    # print(finalMethod)
 
     value = jcall(class, finalMethod, parsedValues...)
 
@@ -173,7 +189,12 @@ function compareTypes(javaType::Any,juliaType::Any)
             return true
         end
     end
-    if juliaType isa String
+    if juliaType == JString
+        if javaType == "String" || javaType == "java.lang.Object"
+            return true
+        end
+    end
+    if juliaType <: JavaObject
         if javaType == "java.lang.Object"
             return true
         end
@@ -189,7 +210,7 @@ function convertToJavaType(type::Any)
     if(typeof(type) == UInt8)
         return jboolean(type)
     end
-    if(typeof(type) == UInt16)
+    if(typeof(type) == UInt16 || typeof(type) == Char)
         return jchar(type)
     end
     if(typeof(type) == Int32)
@@ -219,43 +240,49 @@ end
 ########################### Tests ############################
 ##############################################################
 
-time = @jimport "java.time.LocalDate"
+time = @javaimport "java.time.LocalDate"
 now = time.now()
 now.plusDays(4)
 
-math = @jimport "java.lang.Math"
+math = @javaimport "java.lang.Math"
 math.abs(-1)
 
-time2 = @jimport "java.time.LocalDate"
+time2 = @javaimport "java.time.LocalDate"
 now.plusDays(4).plusDays(2).plusDays(4)
 
-date = @jimport "java.util.Date"
+date = @javaimport "java.util.Date"
 newDate = newInstance(date)
 newDate.getTime()
 newDate.getDay()
 
-hashMap = @jimport "java.util.HashMap"
+hashMap = @javaimport "java.util.HashMap"
 jmap = newInstance(hashMap)
 jmap.put("ola", "adeus")
 
-url = @jimport "java.net.URL"
+url = @javaimport "java.net.URL"
 newUrl = newInstance(url, "http://www.google.com")
 
-list = @jimport "java.util.ArrayList"
+list = @javaimport "java.util.ArrayList"
 arrList = newInstance(list)
 arrList.add("ola")
 arrList.get(0)
 
-string = @jimport "java.lang.String"
+string = @javaimport "java.lang.String"
 newstr = newInstance(string, "ola")
 concatenated = newstr.concat("olaaaa")
 concatConcat = concatenated.concat("dfudfhd")
 testReplace = concatConcat.replace('d', 'c')
 
-boolean = @jimport "java.lang.Boolean"
+boolean = @javaimport "java.lang.Boolean"
 booleanConstr = newInstance(boolean, "false")
 # boolean.FALSE() # static fields. Should we deal with this?
 
+integer = @javaimport "java.lang.Integer"
+intConstructor = newInstance(integer, Int32(1))
+
+newList = newInstance(list)
+newList.add(intConstructor)
+newList.add(booleanConstr) # lista é generica e permite isto
 
 ##############################################################
 ############################ TODO ############################
@@ -265,6 +292,10 @@ booleanConstr = newInstance(boolean, "false")
 # - Try to deal with Java Exceptions
 # - Deal with null values in show (should probably be handled by
 #   java Exceptions)
+# - Quando criamos listas elas sao do tipo generico. Ou seja, 
+#   aceitam qualquer tipo de objetos. Devemos permitir isso?
+# - Devemos fazer conversao de tipos primitivos para objetos
+#   por exemplo no caso das listas
 
 
 ##############################################################
