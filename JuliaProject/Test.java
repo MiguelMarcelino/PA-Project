@@ -18,7 +18,7 @@ public class Test {
         d.getDate();
         d.getTime();
         d.getMinutes();
-        
+        Boolean bool = new Boolean("ssss").getClass();
         // Class.forName("java.lang.Math");
     }
 
