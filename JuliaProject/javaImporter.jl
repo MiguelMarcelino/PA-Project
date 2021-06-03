@@ -250,3 +250,14 @@ boolean.FALSE() # static fields. Should we deal with this?
 ##############################################################
 
 # - Temos de tentar com objetos e com as subclasses e superclasses
+# - Try to deal with Java Exceptions
+# - Deal with null values in show (should probably be handled by
+#   java Exceptions)
+
+
+##############################################################
+######################## Presentation ########################
+##############################################################
+
+# - Mention conversion of types (from julia types to Java types)
+# - 
