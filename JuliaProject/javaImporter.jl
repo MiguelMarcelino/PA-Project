@@ -4,14 +4,6 @@ using JavaCall
 
 JavaCall.init(["-Xmx128M"])
 
-macro javaimport(name::Any)
-    if(typeof(name) != String)
-        return "Please supply the name of the class to import as a String"
-    else
-        return javaimport(name)
-    end
-end
-
 # Stores a class reference (:ref) and Stores
 # the original reference (:originalRed) to the
 # object, so that its constructor can be called later
@@ -20,6 +12,14 @@ struct JCallInfo
     originalRef::Any
     methods::Dict
 end
+
+macro javaimport(name::String)
+    return importJavaMethod(name)
+end
+
+# macro javanew(class::JCallInfo, values::Any...)
+#     return newInstance(class, values...)
+# end
 
 # Stores class full path as key and JCallInfo as class
 # information
@@ -45,13 +45,13 @@ Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
 
-function javaimport(fullPath::String)
+function importJavaMethod(fullPath::String)
     elem = get(importedclasses, fullPath, ())
     if(elem!=())
         return elem
     end
     if(isempty(fullPath))
-        return "Please provide a name for the class import"
+        error("Please provide a name for the class import")
     end
 
     originalRef = JavaCall.jimport(fullPath)
@@ -103,7 +103,7 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
         return "No Such Method"
     end
 
-    # consider our own structure as input
+    # consider the created structure as input
     parsedValues = []
     for value in values
         if(typeof(value) <: JCallInfo)
@@ -112,45 +112,47 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
             push!(parsedValues, convertToJavaType(value))
         end
     end
-    # print(parsedValues)
 
-    finalMethod = methods[1][2]
+    chosenmethod = nothing
     valid = true
 
     # debug
     # print(methods)
+    # print(parsedValues)
     # print("\n")
 
     for method in methods
         if(length(method[1]) != length(parsedValues))
             continue
         end
-        if(!isempty(method[1]))
-            for i in eachindex(method[1])
-                # debug
-                # print("Java Type: ")
-                # print(method[1][i])
-                # print("\n")
-                # print("Julia Type: ")
-                # print(typeof(parsedValues[i]))
-                # print("\n")
-                if !compareTypes(method[1][i],typeof(parsedValues[i]))
-                    valid = false
-                    break
-                end
+        for i in eachindex(method[1])
+            # debug
+            # print("Java Type: ")
+            # print(method[1][i])
+            # print("\n")
+            # print("Julia Type: ")
+            # print(typeof(parsedValues[i]))
+            # print("\n")
+            if !compareTypes(method[1][i],typeof(parsedValues[i]))
+                valid = false
+                break
             end
         end
         if(valid)
-            finalMethod = method[2]
+            chosenmethod = method[2]
         end
         valid = true
     end
 
     # debug
     # print("\n")
-    # print(finalMethod)
+    # print(chosenmethod)
 
-    value = jcall(class, finalMethod, parsedValues...)
+    if(chosenmethod === nothing)
+        error("No method found with the provided arguments")
+    end
+
+    value = jcall(class, chosenmethod, parsedValues...)
 
     classobject = class
     if(typeof(class)!=JClass)
@@ -167,39 +169,39 @@ end
 ######################### Converters #########################
 ##############################################################
 
-function compareTypes(javaType::Any,juliaType::Any)
-    if juliaType isa jboolean
+function compareTypes(javaType::String, juliaType::Any)
+    if juliaType <: jboolean
         if javaType == "boolean"
             return true
         end
     end
-    if juliaType isa jchar
+    if juliaType <: jchar
         if javaType == "char"
             return true
         end
     end
-    if juliaType isa jint
+    if juliaType <: jint
         if javaType == "int"
             return true
         end
     end
-    if juliaType isa jlong
+    if juliaType <: jlong
         if javaType == "long"
             return true
         end
     end
-    if juliaType isa jfloat
+    if juliaType <: jfloat
         if javaType == "float"
             return true
         end
     end
-    if juliaType isa jdouble
+    if juliaType <: jdouble
         if javaType == "double"
             return true
         end
     end
-    if juliaType == JString
-        if javaType == "String" || javaType == "java.lang.Object"
+    if juliaType <: JString
+        if javaType == "String" || javaType == "java.lang.String" || javaType == "java.lang.Object"
             return true
         end
     end
@@ -306,7 +308,7 @@ newUrl = newInstance(url, "http://www.google.com")
 list = @javaimport "java.util.ArrayList"
 arrList = newInstance(list)
 arrList.add("ola")
-arrList.get(0)
+arrList.get(Int32(0)) # Deviamos resolver isto?
 
 string = @javaimport "java.lang.String"
 newstr = newInstance(string, "ola")
@@ -324,20 +326,39 @@ newList = newInstance(list)
 newList.add(primitiveToObject(1))
 newList.add(booleanConstr) # lista é generica e permite isto
 
+long = @javaimport "java.lang.Long"
+longImpl = newInstance(long, Int64(1))
+
+void = @javaimport "java.lang.Void"
+newVoid = newInstance(void) # funciona?? O que fazemos neste caso?
+
+class = @javaimport "java.lang.Class"
+stringClass = class.forName("java.lang.String") 
+typeof(getfield(stringClass, :ref)) # retorna: JClass (alias for JavaObject{Symbol("java.lang.Class")})
+
+random = @javaimport "java.util.Random"
+newrandom = newInstance(random, 122)
+newrandom.nextLong()
+newrandom.setSeed(0)
+newrandom.nextInt()
+newrandom.ints() # retorna: "java.util.stream.IntPipeline\$Head@52cc8049" --> toString
+
+object = @javaimport "java.lang.Object"
+newobject = newInstance(object)
+
 ##############################################################
 ############################ TODO ############################
 ##############################################################
 
-# - Temos de tentar com objetos e com as subclasses e superclasses
-# - Try to deal with Java Exceptions
-# - Deal with null values in show (should probably be handled by
-#   java Exceptions)
 # - Quando criamos listas elas sao do tipo generico. Ou seja, 
 #   aceitam qualquer tipo de objetos. Devemos permitir isso?
 # - Devemos fazer conversao de tipos primitivos para objetos
 #   por exemplo no caso das listas?
 # - primitiveToObject podia ser uma macro?
-
+# - Na API do Julia diz que usar "==" para comparar tipos pode 
+#   nao ser ideal. Acha que devemos usar o "<:" ou o "isa"?
+# - Ao tentar fazer class.forName("...") nao funciona
+# - Ate que ponto é que macros sao uma boa ideia?
 
 ##############################################################
 ######################## Presentation ########################
