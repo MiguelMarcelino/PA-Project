@@ -13,14 +13,6 @@ struct JCallInfo
     methods::Dict
 end
 
-macro javaimport(name::String)
-    return importJavaMethod(name)
-end
-
-# macro javanew(class::JCallInfo, values::Any...)
-#     return newInstance(class, values...)
-# end
-
 # Stores class full path as key and JCallInfo as class
 # information
 importedclasses = Dict{String, JCallInfo}()
@@ -35,17 +27,12 @@ Base.show(io::IO, jv::JCallInfo) =
             else
                 show(io, showJuliaType(getfield(jv, :ref)))
             end
-            
-# Base.show(io::IO, jv::JavaCall.JavaCallError) =
-#             show(io, jv.msg)
-
-# Base.show(io::IO, nt::JavaCall.JavaCallError) = show(io, nt.msg)
 
 Base.getproperty(jv::JCallInfo, sym::Symbol) =
             (values...) -> findBestMethod(getfield(jv,:ref),getfield(jv, :methods)[String(sym)],values...)
 
 
-function importJavaMethod(fullPath::String)
+function javaimport(fullPath::String)
     elem = get(importedclasses, fullPath, ())
     if(elem!=())
         return elem
@@ -116,23 +103,11 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
     chosenmethod = nothing
     valid = true
 
-    # debug
-    # print(methods)
-    # print(parsedValues)
-    # print("\n")
-
     for method in methods
         if(length(method[1]) != length(parsedValues))
             continue
         end
         for i in eachindex(method[1])
-            # debug
-            # print("Java Type: ")
-            # print(method[1][i])
-            # print("\n")
-            # print("Julia Type: ")
-            # print(typeof(parsedValues[i]))
-            # print("\n")
             if !compareTypes(method[1][i],typeof(parsedValues[i]))
                 valid = false
                 break
@@ -143,10 +118,6 @@ function findBestMethod(class::Any, methods::Vector, values::Any...)
         end
         valid = true
     end
-
-    # debug
-    # print("\n")
-    # print(chosenmethod)
 
     if(chosenmethod === nothing)
         error("No method found with the provided arguments")
@@ -240,32 +211,32 @@ function convertToJavaType(type::Any)
 end
 
 function primitiveToObject(object::Any) 
-    if typeof(object) == String
-        string = @javaimport "java.lang.String"
+    if typeof(object) <: String
+        string = javaimport("java.lang.String")
         return newInstance(string, object)
     end
     if(typeof(object) == UInt8)
-        boolean = @javaimport "java.lang.Boolean"
+        boolean = javaimport("java.lang.Boolean")
         return newInstance(boolean, object)
     end
     if(typeof(object) == UInt16 || typeof(object) == Char)
-        character = @javaimport "java.lang.Character"
+        character = javaimport("java.lang.Character")
         return newInstance(character, object)
     end
     if(typeof(object) == Int32)
-        integer = @javaimport "java.lang.Integer"
+        integer = javaimport("java.lang.Integer")
         return newInstance(integer, object)
     end
     if(typeof(object) == Int64)
-        long = @javaimport "java.lang.Long"
+        long = javaimport("java.lang.Long")
         return newInstance(long, object)
     end
     if(typeof(object) == Float32)
-        float = @javaimport "java.lang.Float"
+        float = javaimport("java.lang.Float")
         return newInstance(float, object)
     end
     if(typeof(object) == Float64)
-        double = @javaimport "java.lang.Double"
+        double = javaimport("java.lang.Double")
         return newInstance(double, object)
     end
     return object
@@ -283,43 +254,43 @@ end
 ########################### Tests ############################
 ##############################################################
 
-time = @javaimport "java.time.LocalDate"
+time = javaimport("java.time.LocalDate")
 now = time.now()
 now.plusDays(4)
 
-math = @javaimport "java.lang.Math"
+math = javaimport("java.lang.Math")
 math.abs(-1)
 
-time2 = @javaimport "java.time.LocalDate"
+time2 = javaimport("java.time.LocalDate")
 now.plusDays(4).plusDays(2).plusDays(4)
 
-date = @javaimport "java.util.Date"
+date = javaimport("java.util.Date")
 newDate = newInstance(date)
 newDate.getTime()
 newDate.getDay()
 
-hashMap = @javaimport "java.util.HashMap"
+hashMap = javaimport("java.util.HashMap")
 jmap = newInstance(hashMap)
 jmap.put("ola", "adeus")
 
-url = @javaimport "java.net.URL"
+url = javaimport("java.net.URL")
 newUrl = newInstance(url, "http://www.google.com")
 
-list = @javaimport "java.util.ArrayList"
+list = javaimport("java.util.ArrayList")
 arrList = newInstance(list)
 arrList.add("ola")
 arrList.get(Int32(0)) # Tentar conversao caso nao haja mais de um metodo
 
-string = @javaimport "java.lang.String"
+string = javaimport("java.lang.String")
 newstr = newInstance(string, "ola")
 concatenated = newstr.concat("olaaaa")
 concatConcat = concatenated.concat("dfudfhd")
 testReplace = concatConcat.replace('d', 'c')
 
-boolean = @javaimport "java.lang.Boolean"
+boolean = javaimport("java.lang.Boolean")
 booleanConstr = newInstance(boolean, "false")
 
-integer = @javaimport "java.lang.Integer"
+integer = javaimport("java.lang.Integer")
 intConstructor = newInstance(integer, Int32(1))
 value = intConstructor.intValue()
 intConstructor.parseInt("2")
@@ -328,27 +299,25 @@ newList = newInstance(list)
 newList.add(primitiveToObject(1))
 newList.add(booleanConstr) # (nao é problema)
 
-long = @javaimport "java.lang.Long"
+long = javaimport("java.lang.Long")
 longImpl = newInstance(long, Int64(1))
 
-void = @javaimport "java.lang.Void"
+void = javaimport("java.lang.Void")
 newVoid = newInstance(void) # (valor que representa o Void)
 
-class = @javaimport "java.lang.Class"
+class = javaimport("java.lang.Class")
 stringClass = class.forName("java.lang.String") 
 typeof(getfield(stringClass, :ref)) # retorna: JClass (alias for JavaObject{Symbol("java.lang.Class")})
 
-random = @javaimport "java.util.Random"
+random = javaimport("java.util.Random")
 newrandom = newInstance(random, 122)
 newrandom.nextLong()
 newrandom.setSeed(0)
 newrandom.nextInt()
 newrandom.ints() # retorna: "java.util.stream.IntPipeline\$Head@52cc8049" --> toString
 
-object = @javaimport "java.lang.Object"
+object = javaimport("java.lang.Object")
 newobject = newInstance(object)
-
-@macroexpand @javaimport "java.lang.Long"
 
 
 ##############################################################
