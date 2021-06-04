@@ -5,11 +5,11 @@ import java.util.Date;
 
 public class Test {
     public static void main(String[] args) {
-        Test test = new Test();
-        Method[] methods = test.getClass().getMethods();
-        methods[0].getName();
-        methods[0].getParameterTypes();
-        methods[0].getParameterTypes();
+        // Test test = new Test();
+        // Method[] methods = test.getClass().getMethods();
+        // methods[0].getName();
+        // methods[0].getParameterTypes();
+        // methods[0].getParameterTypes();
         Math.class.getMethods();
         LocalDate l = LocalDate.now(Clock.systemUTC());
         LocalDate.of(2002, 12, 11);

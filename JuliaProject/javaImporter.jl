@@ -308,7 +308,7 @@ newUrl = newInstance(url, "http://www.google.com")
 list = @javaimport "java.util.ArrayList"
 arrList = newInstance(list)
 arrList.add("ola")
-arrList.get(Int32(0)) # Deviamos resolver isto?
+arrList.get(Int32(0)) # Tentar conversao caso nao haja mais de um metodo
 
 string = @javaimport "java.lang.String"
 newstr = newInstance(string, "ola")
@@ -321,16 +321,18 @@ booleanConstr = newInstance(boolean, "false")
 
 integer = @javaimport "java.lang.Integer"
 intConstructor = newInstance(integer, Int32(1))
+value = intConstructor.intValue()
+intConstructor.parseInt("2")
 
 newList = newInstance(list)
 newList.add(primitiveToObject(1))
-newList.add(booleanConstr) # lista é generica e permite isto
+newList.add(booleanConstr) # (nao é problema)
 
 long = @javaimport "java.lang.Long"
 longImpl = newInstance(long, Int64(1))
 
 void = @javaimport "java.lang.Void"
-newVoid = newInstance(void) # funciona?? O que fazemos neste caso?
+newVoid = newInstance(void) # (valor que representa o Void)
 
 class = @javaimport "java.lang.Class"
 stringClass = class.forName("java.lang.String") 
@@ -345,6 +347,9 @@ newrandom.ints() # retorna: "java.util.stream.IntPipeline\$Head@52cc8049" --> to
 
 object = @javaimport "java.lang.Object"
 newobject = newInstance(object)
+
+@macroexpand @javaimport "java.lang.Long"
+
 
 ##############################################################
 ############################ TODO ############################
